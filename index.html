@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFA - Schedule Dashboard</title>
+    <meta name="description" content="Read-only TV digital dashboard for SAFA schedule." />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS SDK CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100vh;
+            width: 100vw;
+            background-color: #090e1a; /* Ultra-deep high-contrast slate */
+            color: #f8fafc;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            padding: 1.5vh 2vw;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 6.5vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1e293b;
+            padding-bottom: 0.8vh;
+            margin-bottom: 0.8vh;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+        }
+
+        .brand-logo {
+            font-size: 3.8vh;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            color: #38bdf8;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .brand-title {
+            font-size: 2.2vh;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+            text-transform: uppercase;
+            border-left: 2px solid #334155;
+            padding-left: 1vw;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.6vw;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            padding: 0.4vh 1vw;
+            border-radius: 9999px;
+            font-size: 1.8vh;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .live-dot {
+            height: 1.2vh;
+            width: 1.2vh;
+            background-color: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #22c55e;
+            animation: pulse-green 2s infinite;
+        }
+
+        .live-dot.offline {
+            background-color: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+            animation: none;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .clock-display {
+            font-size: 3vh;
+            font-weight: 700;
+            color: #f1f5f9;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.05em;
+        }
+
+        /* Table Structure */
+        .table-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background-color: #0f172a;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        /* Columns width ratios */
+        .col-name { width: 16%; }
+        .col-route-1, .col-route-2, .col-route-3 { width: 15%; }
+        .col-type-1, .col-type-2, .col-type-3 { width: 13%; }
+
+        /* Headers */
+        thead {
+            background-color: #1e293b;
+        }
+
+        .top-header-row {
+            height: 4.2vh;
+            border-bottom: 1px solid #334155;
+        }
+
+        .top-header-row th {
+            text-align: center;
+            font-size: 2.2vh;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .day-group-1 {
+            background: linear-gradient(180deg, #1e293b 0%, #172554 100%);
+            color: #60a5fa;
+            border-left: 2px solid #3b82f6;
+            border-right: 2px solid #334155;
+        }
+
+        .day-group-2 {
+            background: linear-gradient(180deg, #1e293b 0%, #1e1b4b 100%);
+            color: #a78bfa;
+            border-right: 2px solid #334155;
+        }
+
+        .day-group-3 {
+            background: linear-gradient(180deg, #1e293b 0%, #042f2e 100%);
+            color: #2dd4bf;
+            border-right: 1px solid #334155;
+        }
+
+        .sub-header-row {
+            height: 3.6vh;
+            background-color: #111c30;
+            border-bottom: 2px solid #334155;
+        }
+
+        .sub-header-row th {
+            font-size: 1.8vh;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            text-transform: uppercase;
+            padding: 0 0.8vw;
+            text-align: left;
+        }
+
+        .sub-header-row th.text-center {
+            text-align: center;
+        }
+
+        /* Data Rows: exactly 15 rows distributed evenly */
+        tbody tr {
+            height: calc((100% - 7.8vh) / 15);
+            border-bottom: 1px solid #1e293b;
+            transition: background-color 0.15s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #0b1322;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #101a2d;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 0 0.8vw;
+            font-size: 2.1vh;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+
+        /* Column Group Dividers */
+        .day-divider-left {
+            border-left: 2px solid #334155;
+        }
+        .day-divider-right {
+            border-right: 2px solid #334155;
+        }
+
+        .cell-name {
+            color: #f8fafc;
+            font-weight: 700;
+            font-size: 2.2vh;
+            letter-spacing: 0.02em;
+        }
+
+        .cell-route {
+            color: #e2e8f0;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Type Badges */
+        .badge {
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+            max-width: 9vw;
+            padding: 0.25vh 0;
+            border-radius: 0.375rem;
+            font-size: 1.8vh;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .badge-order {
+            background-color: rgba(14, 165, 233, 0.18);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+        }
+
+        .badge-supply {
+            background-color: rgba(34, 197, 94, 0.18);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.4);
+        }
+
+        .badge-empty {
+            color: #475569;
+        }
+
+        .empty-row-text {
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Top Bar Header -->
+        <div class="top-bar">
+            <div class="brand-section">
+                <div class="brand-logo">SAFA</div>
+                <div class="brand-title">Schedule Dashboard</div>
+            </div>
+            
+            <div class="status-badge">
+                <span class="live-dot" id="connection-dot"></span>
+                <span id="connection-status">Connecting...</span>
+            </div>
+
+            <div class="clock-display" id="live-clock">00:00:00</div>
+        </div>
+
+        <!-- 15-Row Schedule Table -->
+        <div class="table-wrapper">
+            <table>
+                <colgroup>
+                    <col class="col-name">
+                    <col class="col-route-1">
+                    <col class="col-type-1">
+                    <col class="col-route-2">
+                    <col class="col-type-2">
+                    <col class="col-route-3">
+                    <col class="col-type-3">
+                </colgroup>
+                <thead>
+                    <!-- Top Header Row: Grouped by Date / Day -->
+                    <tr class="top-header-row">
+                        <th></th>
+                        <th colspan="2" class="day-group-1 day-divider-left" id="header-day-1">1/1/2026 MON</th>
+                        <th colspan="2" class="day-group-2 day-divider-left" id="header-day-2">2/1/2026 TUE</th>
+                        <th colspan="2" class="day-group-3 day-divider-left" id="header-day-3">3/1/2026 WED</th>
+                    </tr>
+                    <!-- Sub-Header Row -->
+                    <tr class="sub-header-row">
+                        <th>NAME</th>
+                        <th class="day-divider-left">ROUTE</th>
+                        <th class="text-center">TYPE</th>
+                        <th class="day-divider-left">ROUTE</th>
+                        <th class="text-center">TYPE</th>
+                        <th class="day-divider-left">ROUTE</th>
+                        <th class="text-center">TYPE</th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-body">
+                    <!-- Exactly 15 rows injected dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // -------------------------------------------------------------
+        // Live Clock & Midnight Rollover Logic
+        // -------------------------------------------------------------
+        let currentTodayStr = new Date().toDateString();
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: true, 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('live-clock').textContent = timeString;
+            
+            // Check for midnight rollover
+            if (now.toDateString() !== currentTodayStr) {
+                console.log("Midnight Rollover Detected: Shifting 3-day window forward.");
+                currentTodayStr = now.toDateString();
+                fetchSupabaseSchedule(); // Re-calculate dates and re-fetch data
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // -------------------------------------------------------------
+        // Date Utilities for the Rolling 3-Day Window
+        // -------------------------------------------------------------
+        function getRollingDates() {
+            const today = new Date();
+            const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+            const dayAfter = new Date(today); dayAfter.setDate(today.getDate() + 2);
+            return [today, tomorrow, dayAfter];
+        }
+
+        function formatDateForDB(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDateForHeader(d) {
+            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${days[d.getDay()]}`;
+        }
+
+        function getTypeBadge(typeStr) {
+            if (!typeStr) return '<span class="badge-empty">-</span>';
+            const clean = typeStr.trim().toUpperCase();
+            if (clean.includes('ORDER')) {
+                return `<span class="badge badge-order">ORDER</span>`;
+            } else if (clean.includes('SUPP')) {
+                return `<span class="badge badge-supply">SUPPLY</span>`;
+            }
+            return `<span class="badge badge-order">${clean}</span>`;
+        }
+
+        // -------------------------------------------------------------
+        // Render Logic
+        // -------------------------------------------------------------
+        const tableBody = document.getElementById('schedule-body');
+
+        function renderRows(rawData = [], dateStrs = []) {
+            // Set Headers
+            const dates = getRollingDates();
+            document.getElementById('header-day-1').textContent = formatDateForHeader(dates[0]);
+            document.getElementById('header-day-2').textContent = formatDateForHeader(dates[1]);
+            document.getElementById('header-day-3').textContent = formatDateForHeader(dates[2]);
+
+            // Group Flat Relational Data by Person
+            const grouped = {};
+            rawData.forEach(row => {
+                const name = row.person_name;
+                if (!grouped[name]) grouped[name] = {};
+                // Match the exact YYYY-MM-DD string
+                grouped[name][row.route_date] = { route: row.route, type: row.type };
+            });
+
+            // Extract sorted unique names to maintain fixed layout structure
+            // If we have less than 15 people in the DB, it will pad with blanks automatically.
+            const uniqueNames = Object.keys(grouped).sort();
+
+            tableBody.innerHTML = '';
+
+            // Render EXACTLY 15 rows for TV layout
+            for (let i = 0; i < 15; i++) {
+                const tr = document.createElement('tr');
+                const name = uniqueNames[i];
+
+                if (name) {
+                    const d1 = grouped[name][dateStrs[0]] || {};
+                    const d2 = grouped[name][dateStrs[1]] || {};
+                    const d3 = grouped[name][dateStrs[2]] || {};
+
+                    tr.innerHTML = `
+                        <td class="cell-name">${name}</td>
+                        <td class="cell-route day-divider-left">${d1.route || '-'}</td>
+                        <td class="text-center">${getTypeBadge(d1.type)}</td>
+                        <td class="cell-route day-divider-left">${d2.route || '-'}</td>
+                        <td class="text-center">${getTypeBadge(d2.type)}</td>
+                        <td class="cell-route day-divider-left">${d3.route || '-'}</td>
+                        <td class="text-center">${getTypeBadge(d3.type)}</td>
+                    `;
+                } else {
+                    // Empty row placeholder to keep layout stable
+                    tr.innerHTML = `
+                        <td class="empty-row-text">-</td>
+                        <td class="empty-row-text day-divider-left">-</td>
+                        <td class="empty-row-text text-center">-</td>
+                        <td class="empty-row-text day-divider-left">-</td>
+                        <td class="empty-row-text text-center">-</td>
+                        <td class="empty-row-text day-divider-left">-</td>
+                        <td class="empty-row-text text-center">-</td>
+                    `;
+                }
+                tableBody.appendChild(tr);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // Supabase Live Client Configuration
+        // -------------------------------------------------------------
+        const SUPABASE_URL = 'https://yhtgycnynpinnopbsyhk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlodGd5Y255bnBpbm5vcGJzeWhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDQ3OTgsImV4cCI6MjEwMzU4MDc5OH0.JPZQ849JWqTiw07VvZEvMXJJHHPLQimSvLalEhS9nro';
+
+        let supabaseClient = null;
+
+        if (SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } catch (err) {
+                console.error("Supabase init error:", err);
+            }
+        }
+
+        async function fetchSupabaseSchedule() {
+            // Get the target 3-day DB filter strings (YYYY-MM-DD)
+            const dates = getRollingDates();
+            const dateStrs = [
+                formatDateForDB(dates[0]),
+                formatDateForDB(dates[1]),
+                formatDateForDB(dates[2])
+            ];
+
+            if (!supabaseClient) {
+                // If keys are missing, just render the blank grid with the right dates
+                renderRows([], dateStrs);
+                document.getElementById('connection-status').textContent = 'Demo Mode (No Keys)';
+                document.getElementById('connection-dot').classList.add('offline');
+                return;
+            }
+
+            try {
+                // Query only the data within our dynamic 3-day window!
+                const { data, error } = await supabaseClient
+                    .from('safa_daily_routes')
+                    .select('*')
+                    .gte('route_date', dateStrs[0])
+                    .lte('route_date', dateStrs[2]);
+
+                if (error) throw error;
+
+                // Pass the data and target dates to perfectly map the columns
+                renderRows(data || [], dateStrs);
+                
+                document.getElementById('connection-status').textContent = 'Live (Realtime)';
+                document.getElementById('connection-dot').classList.remove('offline');
+            } catch (err) {
+                console.error('Could not fetch remote table:', err);
+                document.getElementById('connection-status').textContent = 'Error (Retrying...)';
+                document.getElementById('connection-dot').classList.add('offline');
+                // Optional retry loop here
+            }
+        }
+
+        // Initial Data Fetch
+        fetchSupabaseSchedule();
+
+        // Realtime Subscription
+        if (supabaseClient) {
+            supabaseClient
+                .channel('safa-realtime-channel')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'safa_daily_routes' }, (payload) => {
+                    console.log('Realtime change detected:', payload);
+                    fetchSupabaseSchedule(); // Re-fetch current 3 days
+                })
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        document.getElementById('connection-status').textContent = 'Live (Realtime)';
+                        document.getElementById('connection-dot').classList.remove('offline');
+                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                        document.getElementById('connection-status').textContent = 'Connecting...';
+                        document.getElementById('connection-dot').classList.add('offline');
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

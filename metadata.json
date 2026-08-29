@@ -1,0 +1,6 @@
+{
+  "name": "SAFA Display Dashboard",
+  "description": "Read-only TV dashboard for SAFA daily schedule.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
