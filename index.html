@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAFA - Schedule Dashboard</title>
     <meta name="description" content="Read-only TV digital dashboard for SAFA schedule." />
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#090e1a">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon.svg">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS SDK CDN -->
@@ -530,6 +534,21 @@
                         document.getElementById('connection-dot').classList.add('offline');
                     }
                 });
+        }
+
+        // -------------------------------------------------------------
+        // PWA Service Worker Registration
+        // -------------------------------------------------------------
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('PWA ServiceWorker registered with scope:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('PWA ServiceWorker registration failed:', error);
+                    });
+            });
         }
     </script>
 </body>
