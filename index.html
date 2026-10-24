@@ -47,6 +47,7 @@
             border-bottom: 2px solid #1e293b;
             padding-bottom: 0.8vh;
             margin-bottom: 0.8vh;
+            gap: 1vw;
         }
 
         .brand-section {
@@ -73,22 +74,28 @@
             padding-left: 1vw;
         }
 
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.8vw;
+        }
+
         .status-badge {
             display: flex;
             align-items: center;
-            gap: 0.6vw;
+            gap: 0.5vw;
             background-color: #0f172a;
             border: 1px solid #334155;
-            padding: 0.4vh 1vw;
+            padding: 0.4vh 0.9vw;
             border-radius: 9999px;
-            font-size: 1.8vh;
+            font-size: 1.6vh;
             font-weight: 600;
             color: #cbd5e1;
         }
 
         .live-dot {
-            height: 1.2vh;
-            width: 1.2vh;
+            height: 1.1vh;
+            width: 1.1vh;
             background-color: #22c55e;
             border-radius: 50%;
             display: inline-block;
@@ -102,17 +109,97 @@
             animation: none;
         }
 
+        .live-dot.filtered {
+            background-color: #f59e0b;
+            box-shadow: 0 0 10px #f59e0b;
+            animation: none;
+        }
+
         @keyframes pulse-green {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.85); }
         }
 
+        /* Filter Active Pill */
+        .filter-active-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.6vw;
+            background-color: rgba(245, 158, 11, 0.16);
+            border: 1px solid #f59e0b;
+            color: #fde68a;
+            padding: 0.35vh 0.8vw;
+            border-radius: 9999px;
+            font-size: 1.5vh;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .filter-pill-dot {
+            height: 0.9vh;
+            width: 0.9vh;
+            background-color: #f59e0b;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #f59e0b;
+        }
+
+        .quick-reset-btn {
+            background: rgba(245, 158, 11, 0.25);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            color: #ffffff;
+            padding: 0.15vh 0.6vw;
+            border-radius: 9999px;
+            font-size: 1.3vh;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .quick-reset-btn:hover {
+            background: #f59e0b;
+            color: #090e1a;
+        }
+
+        /* Filter Trigger Button */
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4vw;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            padding: 0.45vh 1vw;
+            border-radius: 9999px;
+            font-size: 1.7vh;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .filter-btn:hover {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .filter-btn.active {
+            border-color: #f59e0b;
+            color: #f59e0b;
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+        }
+
         .clock-display {
-            font-size: 3vh;
+            font-size: 2.8vh;
             font-weight: 700;
             color: #f1f5f9;
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.05em;
+            padding-left: 0.4vw;
         }
 
         /* Table Structure */
@@ -135,11 +222,6 @@
             table-layout: fixed;
         }
 
-        /* Columns width ratios */
-        .col-name { width: 16%; }
-        .col-route-1, .col-route-2, .col-route-3 { width: 15%; }
-        .col-type-1, .col-type-2, .col-type-3 { width: 13%; }
-
         /* Headers */
         thead {
             background-color: #1e293b;
@@ -158,23 +240,37 @@
             text-transform: uppercase;
         }
 
-        .day-group-1 {
+        /* Dynamic Day Group Header Gradients */
+        .day-group-yesterday {
+            background: linear-gradient(180deg, #1e293b 0%, #451a03 100%);
+            color: #fbbf24;
+            border-left: 2px solid #d97706;
+            border-right: 2px solid #334155;
+            text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+        }
+
+        .day-group-today {
             background: linear-gradient(180deg, #1e293b 0%, #172554 100%);
             color: #60a5fa;
             border-left: 2px solid #3b82f6;
             border-right: 2px solid #334155;
+            text-shadow: 0 0 12px rgba(96, 165, 250, 0.35);
         }
 
-        .day-group-2 {
+        .day-group-tomorrow {
             background: linear-gradient(180deg, #1e293b 0%, #1e1b4b 100%);
-            color: #a78bfa;
+            color: #c084fc;
+            border-left: 2px solid #a855f7;
             border-right: 2px solid #334155;
+            text-shadow: 0 0 12px rgba(192, 132, 252, 0.35);
         }
 
-        .day-group-3 {
+        .day-group-other {
             background: linear-gradient(180deg, #1e293b 0%, #042f2e 100%);
             color: #2dd4bf;
+            border-left: 2px solid #14b8a6;
             border-right: 1px solid #334155;
+            text-shadow: 0 0 12px rgba(45, 212, 191, 0.35);
         }
 
         .sub-header-row {
@@ -230,9 +326,6 @@
         .day-divider-left {
             border-left: 2px solid #334155;
         }
-        .day-divider-right {
-            border-right: 2px solid #334155;
-        }
 
         .cell-name {
             color: #f8fafc;
@@ -280,6 +373,31 @@
         .empty-row-text {
             color: #334155;
         }
+
+        /* Modal Styles */
+        .filter-modal-backdrop {
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .filter-modal-backdrop.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .filter-modal-box {
+            animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.92); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -291,43 +409,47 @@
                 <div class="brand-title">Schedule Dashboard</div>
             </div>
             
-            <div class="status-badge">
-                <span class="live-dot" id="connection-dot"></span>
-                <span id="connection-status">Connecting...</span>
-            </div>
+            <div class="top-bar-right">
+                <!-- Active Filter Indicator Pill (Visible when filtered) -->
+                <div id="filter-active-pill" class="filter-active-pill hidden">
+                    <span class="filter-pill-dot"></span>
+                    <span id="filter-pill-text">FILTERED</span>
+                    <button id="quick-reset-btn" class="quick-reset-btn" title="Reset to Live Rolling Window">✕ Reset</button>
+                </div>
 
-            <div class="clock-display" id="live-clock">00:00:00</div>
+                <!-- Supabase Realtime Status Badge -->
+                <div class="status-badge">
+                    <span class="live-dot" id="connection-dot"></span>
+                    <span id="connection-status">Connecting...</span>
+                </div>
+
+                <!-- Date Range Filter Trigger Button -->
+                <button id="open-filter-btn" class="filter-btn" title="Filter Schedule Dates">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    </svg>
+                    <span>Filter Date</span>
+                </button>
+
+                <!-- Live Clock Display -->
+                <div class="clock-display" id="live-clock">00:00:00</div>
+            </div>
         </div>
 
-        <!-- 15-Row Schedule Table -->
+        <!-- 15-Row Dynamic Schedule Table -->
         <div class="table-wrapper">
-            <table>
-                <colgroup>
-                    <col class="col-name">
-                    <col class="col-route-1">
-                    <col class="col-type-1">
-                    <col class="col-route-2">
-                    <col class="col-type-2">
-                    <col class="col-route-3">
-                    <col class="col-type-3">
+            <table id="schedule-table">
+                <colgroup id="schedule-colgroup">
+                    <!-- Injected dynamically based on active dates -->
                 </colgroup>
                 <thead>
                     <!-- Top Header Row: Grouped by Date / Day -->
-                    <tr class="top-header-row">
-                        <th></th>
-                        <th colspan="2" class="day-group-1 day-divider-left" id="header-day-1">1/1/2026 MON</th>
-                        <th colspan="2" class="day-group-2 day-divider-left" id="header-day-2">2/1/2026 TUE</th>
-                        <th colspan="2" class="day-group-3 day-divider-left" id="header-day-3">3/1/2026 WED</th>
+                    <tr class="top-header-row" id="top-header-row">
+                        <!-- Injected dynamically -->
                     </tr>
-                    <!-- Sub-Header Row -->
-                    <tr class="sub-header-row">
-                        <th>NAME</th>
-                        <th class="day-divider-left">ROUTE</th>
-                        <th class="text-center">TYPE</th>
-                        <th class="day-divider-left">ROUTE</th>
-                        <th class="text-center">TYPE</th>
-                        <th class="day-divider-left">ROUTE</th>
-                        <th class="text-center">TYPE</th>
+                    <!-- Sub-Header Row: Route & Type -->
+                    <tr class="sub-header-row" id="sub-header-row">
+                        <!-- Injected dynamically -->
                     </tr>
                 </thead>
                 <tbody id="schedule-body">
@@ -337,12 +459,98 @@
         </div>
     </div>
 
+    <!-- Date Range & Preset Filter Modal -->
+    <div id="filter-modal" class="filter-modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md">
+        <div class="filter-modal-box bg-[#0f172a] border border-[#334155] rounded-2xl p-6 w-[92vw] max-w-lg shadow-2xl text-slate-100 flex flex-col gap-5">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-[#334155] pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-sky-400 font-extrabold text-xl">📅 Schedule Date Filter</span>
+                    <span id="modal-view-mode-badge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full border border-slate-700">Custom Range</span>
+                </div>
+                <button id="close-filter-modal-btn" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Quick Presets Section -->
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Quick Presets</span>
+                    <span class="text-[11px] text-sky-400 font-semibold">1-Click Fast Switch</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2.5">
+                    <!-- Yesterday Preset Button -->
+                    <button id="preset-yesterday-btn" class="bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/50 hover:border-amber-400 text-amber-300 font-bold py-2.5 px-2 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-sm shadow-amber-500/10">
+                        <span class="text-sm flex items-center gap-1">🕒 Yesterday</span>
+                        <span class="text-[10px] text-amber-200/80 font-medium">1-Day Past View</span>
+                    </button>
+
+                    <!-- Yesterday to Tomorrow Preset Button -->
+                    <button id="preset-yesterday-tomorrow-btn" class="bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/50 hover:border-purple-400 text-purple-300 font-bold py-2.5 px-2 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-sm shadow-purple-500/10">
+                        <span class="text-sm">Yest. → Tom.</span>
+                        <span class="text-[10px] text-purple-200/80 font-medium">3-Day Archive</span>
+                    </button>
+
+                    <!-- Live Rolling 3-Day Window (Default) -->
+                    <button id="preset-live-3day-btn" class="bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold py-2.5 px-2 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-sm shadow-emerald-500/10">
+                        <span class="text-sm flex items-center gap-1">🟢 Live 3-Day</span>
+                        <span class="text-[10px] text-emerald-200/80 font-medium">Today + 2 Days</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom From - To Range Section -->
+            <div class="flex flex-col gap-3 pt-3 border-t border-[#334155]">
+                <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Select Custom Date Range (From - To)</span>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">From Date (Start)</label>
+                        <input type="date" id="filter-from-date" class="w-full bg-[#0b1322] border border-[#334155] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">To Date (End)</label>
+                        <input type="date" id="filter-to-date" class="w-full bg-[#0b1322] border border-[#334155] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+                    <span>Supports 1 to 5 days view.</span>
+                    <button id="preset-august-demo-btn" class="text-sky-400 hover:text-sky-300 underline font-medium cursor-pointer">
+                        View Sample Seed (29–31 Aug)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex items-center justify-between pt-3 border-t border-[#334155] gap-3">
+                <button id="reset-filter-modal-btn" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">
+                    Reset to Live
+                </button>
+                <div class="flex items-center gap-2">
+                    <button id="cancel-filter-modal-btn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                        Cancel
+                    </button>
+                    <button id="apply-filter-btn" class="px-5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-slate-950 transition shadow-lg shadow-sky-500/25">
+                        Apply Filter View
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // -------------------------------------------------------------
+        // Application State
+        // -------------------------------------------------------------
+        let isCustomFilter = false;
+        let customFilterDates = []; // Array of Date objects when filtered
+        let currentTodayStr = new Date().toDateString();
+
         // -------------------------------------------------------------
         // Live Clock & Midnight Rollover Logic
         // -------------------------------------------------------------
-        let currentTodayStr = new Date().toDateString();
-
         function updateClock() {
             const now = new Date();
             const timeString = now.toLocaleTimeString('en-US', { 
@@ -353,24 +561,32 @@
             });
             document.getElementById('live-clock').textContent = timeString;
             
-            // Check for midnight rollover
+            // Check for midnight rollover (only in default live rolling mode)
             if (now.toDateString() !== currentTodayStr) {
-                console.log("Midnight Rollover Detected: Shifting 3-day window forward.");
                 currentTodayStr = now.toDateString();
-                fetchSupabaseSchedule(); // Re-calculate dates and re-fetch data
+                if (!isCustomFilter) {
+                    console.log("Midnight Rollover Detected: Shifting 3-day live window forward.");
+                    fetchSupabaseSchedule(); // Re-calculate rolling dates and re-fetch data
+                }
             }
         }
         setInterval(updateClock, 1000);
         updateClock();
 
         // -------------------------------------------------------------
-        // Date Utilities for the Rolling 3-Day Window
+        // Date Utilities
         // -------------------------------------------------------------
         function getRollingDates() {
             const today = new Date();
             const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
             const dayAfter = new Date(today); dayAfter.setDate(today.getDate() + 2);
             return [today, tomorrow, dayAfter];
+        }
+
+        function getYesterdayDate() {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            return yesterday;
         }
 
         function formatDateForDB(d) {
@@ -380,9 +596,43 @@
             return `${year}-${month}-${day}`;
         }
 
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
         function formatDateForHeader(d) {
             const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-            return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${days[d.getDay()]}`;
+            const dateStr = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${days[d.getDay()]}`;
+            
+            const today = new Date();
+            const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
+            const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
+
+            if (isSameDay(d, yesterday)) {
+                return `${dateStr} • YEST`;
+            } else if (isSameDay(d, today)) {
+                return `${dateStr} • TODAY`;
+            } else if (isSameDay(d, tomorrow)) {
+                return `${dateStr} • TOM`;
+            }
+            return dateStr;
+        }
+
+        function getDayGroupClass(d, idx) {
+            const today = new Date();
+            const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
+            const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
+
+            if (isSameDay(d, yesterday)) {
+                return 'day-group-yesterday';
+            } else if (isSameDay(d, today)) {
+                return 'day-group-today';
+            } else if (isSameDay(d, tomorrow)) {
+                return 'day-group-tomorrow';
+            }
+            return 'day-group-other';
         }
 
         function getTypeBadge(typeStr) {
@@ -397,28 +647,93 @@
         }
 
         // -------------------------------------------------------------
-        // Render Logic
+        // Dynamic Table Structure & Render Logic
         // -------------------------------------------------------------
+        const scheduleColgroup = document.getElementById('schedule-colgroup');
+        const topHeaderRow = document.getElementById('top-header-row');
+        const subHeaderRow = document.getElementById('sub-header-row');
         const tableBody = document.getElementById('schedule-body');
 
-        function renderRows(rawData = [], dateStrs = []) {
-            // Set Headers
-            const dates = getRollingDates();
-            document.getElementById('header-day-1').textContent = formatDateForHeader(dates[0]);
-            document.getElementById('header-day-2').textContent = formatDateForHeader(dates[1]);
-            document.getElementById('header-day-3').textContent = formatDateForHeader(dates[2]);
+        function updateTableStructure(activeDates) {
+            const numDays = activeDates.length;
 
-            // Group Flat Relational Data by Person
+            // 1. Generate Colgroup based on number of days
+            let colgroupHTML = '';
+            if (numDays === 1) {
+                colgroupHTML = `
+                    <col style="width: 28%;">
+                    <col style="width: 44%;">
+                    <col style="width: 28%;">
+                `;
+            } else if (numDays === 2) {
+                colgroupHTML = `
+                    <col style="width: 20%;">
+                    <col style="width: 26%;">
+                    <col style="width: 14%;">
+                    <col style="width: 26%;">
+                    <col style="width: 14%;">
+                `;
+            } else if (numDays === 3) {
+                colgroupHTML = `
+                    <col style="width: 16%;">
+                    <col style="width: 15%;">
+                    <col style="width: 13%;">
+                    <col style="width: 15%;">
+                    <col style="width: 13%;">
+                    <col style="width: 15%;">
+                    <col style="width: 13%;">
+                `;
+            } else {
+                // 4 or more days
+                const nameWidth = 16;
+                const remaining = 84;
+                const dayWidth = remaining / numDays;
+                const routeWidth = dayWidth * 0.58;
+                const typeWidth = dayWidth * 0.42;
+
+                colgroupHTML = `<col style="width: ${nameWidth}%;">`;
+                for (let i = 0; i < numDays; i++) {
+                    colgroupHTML += `
+                        <col style="width: ${routeWidth}%;">
+                        <col style="width: ${typeWidth}%;">
+                    `;
+                }
+            }
+            scheduleColgroup.innerHTML = colgroupHTML;
+
+            // 2. Generate Top Header Row
+            let topHeaderHTML = '<th></th>';
+            activeDates.forEach((d, idx) => {
+                const groupClass = getDayGroupClass(d, idx);
+                topHeaderHTML += `
+                    <th colspan="2" class="${groupClass} day-divider-left">
+                        ${formatDateForHeader(d)}
+                    </th>
+                `;
+            });
+            topHeaderRow.innerHTML = topHeaderHTML;
+
+            // 3. Generate Sub-Header Row
+            let subHeaderHTML = '<th>NAME</th>';
+            for (let i = 0; i < numDays; i++) {
+                subHeaderHTML += `
+                    <th class="day-divider-left">ROUTE</th>
+                    <th class="text-center">TYPE</th>
+                `;
+            }
+            subHeaderRow.innerHTML = subHeaderHTML;
+        }
+
+        function renderRows(rawData = [], dateStrs = []) {
+            // Group Flat Relational Data by Person Name and Date
             const grouped = {};
             rawData.forEach(row => {
                 const name = row.person_name;
                 if (!grouped[name]) grouped[name] = {};
-                // Match the exact YYYY-MM-DD string
                 grouped[name][row.route_date] = { route: row.route, type: row.type };
             });
 
             // Extract sorted unique names to maintain fixed layout structure
-            // If we have less than 15 people in the DB, it will pad with blanks automatically.
             const uniqueNames = Object.keys(grouped).sort();
 
             tableBody.innerHTML = '';
@@ -429,30 +744,25 @@
                 const name = uniqueNames[i];
 
                 if (name) {
-                    const d1 = grouped[name][dateStrs[0]] || {};
-                    const d2 = grouped[name][dateStrs[1]] || {};
-                    const d3 = grouped[name][dateStrs[2]] || {};
-
-                    tr.innerHTML = `
-                        <td class="cell-name">${name}</td>
-                        <td class="cell-route day-divider-left">${d1.route || '-'}</td>
-                        <td class="text-center">${getTypeBadge(d1.type)}</td>
-                        <td class="cell-route day-divider-left">${d2.route || '-'}</td>
-                        <td class="text-center">${getTypeBadge(d2.type)}</td>
-                        <td class="cell-route day-divider-left">${d3.route || '-'}</td>
-                        <td class="text-center">${getTypeBadge(d3.type)}</td>
-                    `;
+                    let rowHTML = `<td class="cell-name">${name}</td>`;
+                    dateStrs.forEach(dateStr => {
+                        const dayData = grouped[name][dateStr] || {};
+                        rowHTML += `
+                            <td class="cell-route day-divider-left">${dayData.route || '-'}</td>
+                            <td class="text-center">${getTypeBadge(dayData.type)}</td>
+                        `;
+                    });
+                    tr.innerHTML = rowHTML;
                 } else {
                     // Empty row placeholder to keep layout stable
-                    tr.innerHTML = `
-                        <td class="empty-row-text">-</td>
-                        <td class="empty-row-text day-divider-left">-</td>
-                        <td class="empty-row-text text-center">-</td>
-                        <td class="empty-row-text day-divider-left">-</td>
-                        <td class="empty-row-text text-center">-</td>
-                        <td class="empty-row-text day-divider-left">-</td>
-                        <td class="empty-row-text text-center">-</td>
-                    `;
+                    let emptyHTML = `<td class="empty-row-text">-</td>`;
+                    dateStrs.forEach(() => {
+                        emptyHTML += `
+                            <td class="empty-row-text day-divider-left">-</td>
+                            <td class="empty-row-text text-center">-</td>
+                        `;
+                    });
+                    tr.innerHTML = emptyHTML;
                 }
                 tableBody.appendChild(tr);
             }
@@ -474,60 +784,88 @@
             }
         }
 
+        function getActiveDates() {
+            if (isCustomFilter && customFilterDates.length > 0) {
+                return customFilterDates;
+            }
+            return getRollingDates();
+        }
+
         async function fetchSupabaseSchedule() {
-            // Get the target 3-day DB filter strings (YYYY-MM-DD)
-            const dates = getRollingDates();
-            const dateStrs = [
-                formatDateForDB(dates[0]),
-                formatDateForDB(dates[1]),
-                formatDateForDB(dates[2])
-            ];
+            const activeDates = getActiveDates();
+            const dateStrs = activeDates.map(d => formatDateForDB(d));
+
+            // Update Dynamic Table Geometry
+            updateTableStructure(activeDates);
+
+            // Update Filter Status Pill
+            const filterPill = document.getElementById('filter-active-pill');
+            const filterPillText = document.getElementById('filter-pill-text');
+            const openFilterBtn = document.getElementById('open-filter-btn');
+            const connDot = document.getElementById('connection-dot');
+
+            if (isCustomFilter) {
+                filterPill.classList.remove('hidden');
+                openFilterBtn.classList.add('active');
+                if (dateStrs.length === 1) {
+                    const singleDate = activeDates[0];
+                    const label = isSameDay(singleDate, getYesterdayDate()) ? 'YESTERDAY' : dateStrs[0];
+                    filterPillText.textContent = `FILTER: ${label}`;
+                } else {
+                    filterPillText.textContent = `FILTER: ${dateStrs[0]} → ${dateStrs[dateStrs.length - 1]}`;
+                }
+                connDot.classList.add('filtered');
+            } else {
+                filterPill.classList.add('hidden');
+                openFilterBtn.classList.remove('active');
+                connDot.classList.remove('filtered');
+            }
 
             if (!supabaseClient) {
-                // If keys are missing, just render the blank grid with the right dates
                 renderRows([], dateStrs);
                 document.getElementById('connection-status').textContent = 'Demo Mode (No Keys)';
-                document.getElementById('connection-dot').classList.add('offline');
+                connDot.classList.add('offline');
                 return;
             }
 
             try {
-                // Query only the data within our dynamic 3-day window!
+                // Query strictly the active date range from DB
+                const fromDateStr = dateStrs[0];
+                const toDateStr = dateStrs[dateStrs.length - 1];
+
                 const { data, error } = await supabaseClient
                     .from('safa_daily_routes')
                     .select('*')
-                    .gte('route_date', dateStrs[0])
-                    .lte('route_date', dateStrs[2]);
+                    .gte('route_date', fromDateStr)
+                    .lte('route_date', toDateStr);
 
                 if (error) throw error;
 
-                // Pass the data and target dates to perfectly map the columns
                 renderRows(data || [], dateStrs);
                 
-                document.getElementById('connection-status').textContent = 'Live (Realtime)';
-                document.getElementById('connection-dot').classList.remove('offline');
+                document.getElementById('connection-status').textContent = isCustomFilter ? 'Filtered View (Live)' : 'Live (Realtime)';
+                connDot.classList.remove('offline');
             } catch (err) {
                 console.error('Could not fetch remote table:', err);
                 document.getElementById('connection-status').textContent = 'Error (Retrying...)';
-                document.getElementById('connection-dot').classList.add('offline');
-                // Optional retry loop here
+                connDot.classList.add('offline');
             }
         }
 
         // Initial Data Fetch
         fetchSupabaseSchedule();
 
-        // Realtime Subscription
+        // Supabase Realtime Subscription
         if (supabaseClient) {
             supabaseClient
                 .channel('safa-realtime-channel')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'safa_daily_routes' }, (payload) => {
                     console.log('Realtime change detected:', payload);
-                    fetchSupabaseSchedule(); // Re-fetch current 3 days
+                    fetchSupabaseSchedule();
                 })
                 .subscribe((status) => {
                     if (status === 'SUBSCRIBED') {
-                        document.getElementById('connection-status').textContent = 'Live (Realtime)';
+                        document.getElementById('connection-status').textContent = isCustomFilter ? 'Filtered View (Live)' : 'Live (Realtime)';
                         document.getElementById('connection-dot').classList.remove('offline');
                     } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                         document.getElementById('connection-status').textContent = 'Connecting...';
@@ -535,6 +873,131 @@
                     }
                 });
         }
+
+        // -------------------------------------------------------------
+        // Filter Modal & Presets Controls
+        // -------------------------------------------------------------
+        const filterModal = document.getElementById('filter-modal');
+        const openFilterBtn = document.getElementById('open-filter-btn');
+        const closeFilterModalBtn = document.getElementById('close-filter-modal-btn');
+        const cancelFilterModalBtn = document.getElementById('cancel-filter-modal-btn');
+        const applyFilterBtn = document.getElementById('apply-filter-btn');
+        const resetFilterModalBtn = document.getElementById('reset-filter-modal-btn');
+        const quickResetBtn = document.getElementById('quick-reset-btn');
+
+        const fromDateInput = document.getElementById('filter-from-date');
+        const toDateInput = document.getElementById('filter-to-date');
+
+        const presetYesterdayBtn = document.getElementById('preset-yesterday-btn');
+        const presetYesterdayTomorrowBtn = document.getElementById('preset-yesterday-tomorrow-btn');
+        const presetLive3DayBtn = document.getElementById('preset-live-3day-btn');
+        const presetAugustDemoBtn = document.getElementById('preset-august-demo-btn');
+
+        function openModal() {
+            const activeDates = getActiveDates();
+            fromDateInput.value = formatDateForDB(activeDates[0]);
+            toDateInput.value = formatDateForDB(activeDates[activeDates.length - 1]);
+            filterModal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            filterModal.classList.add('hidden');
+        }
+
+        function resetToLive() {
+            isCustomFilter = false;
+            customFilterDates = [];
+            closeModal();
+            fetchSupabaseSchedule();
+        }
+
+        function applyDateRange(startDate, endDate) {
+            // Build array of dates from startDate to endDate
+            const dates = [];
+            let curr = new Date(startDate);
+            // Cap at 5 days to preserve readable TV columns
+            let count = 0;
+            while (curr <= endDate && count < 5) {
+                dates.push(new Date(curr));
+                curr.setDate(curr.getDate() + 1);
+                count++;
+            }
+
+            if (dates.length === 0) return;
+
+            isCustomFilter = true;
+            customFilterDates = dates;
+            closeModal();
+            fetchSupabaseSchedule();
+        }
+
+        // Event Listeners for Filter Modal
+        openFilterBtn.addEventListener('click', openModal);
+        closeFilterModalBtn.addEventListener('click', closeModal);
+        cancelFilterModalBtn.addEventListener('click', closeModal);
+        resetFilterModalBtn.addEventListener('click', resetToLive);
+        quickResetBtn.addEventListener('click', resetToLive);
+
+        // Close on background click
+        filterModal.addEventListener('click', (e) => {
+            if (e.target === filterModal) closeModal();
+        });
+
+        // Close on Escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !filterModal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        // Preset 1: Yesterday (Single Day View)
+        presetYesterdayBtn.addEventListener('click', () => {
+            const yest = getYesterdayDate();
+            fromDateInput.value = formatDateForDB(yest);
+            toDateInput.value = formatDateForDB(yest);
+            applyDateRange(yest, yest);
+        });
+
+        // Preset 2: Yesterday to Tomorrow (3-Day Archive View)
+        presetYesterdayTomorrowBtn.addEventListener('click', () => {
+            const yest = getYesterdayDate();
+            const tom = new Date(); tom.setDate(new Date().getDate() + 1);
+            fromDateInput.value = formatDateForDB(yest);
+            toDateInput.value = formatDateForDB(tom);
+            applyDateRange(yest, tom);
+        });
+
+        // Preset 3: Live 3-Day Default
+        presetLive3DayBtn.addEventListener('click', resetToLive);
+
+        // Preset 4: August Seed Demo Data
+        presetAugustDemoBtn.addEventListener('click', () => {
+            const d1 = new Date('2026-08-29T00:00:00');
+            const d3 = new Date('2026-08-31T00:00:00');
+            fromDateInput.value = '2026-08-29';
+            toDateInput.value = '2026-08-31';
+            applyDateRange(d1, d3);
+        });
+
+        // Apply Custom From - To Filter
+        applyFilterBtn.addEventListener('click', () => {
+            if (!fromDateInput.value || !toDateInput.value) {
+                alert('Please select both From and To dates.');
+                return;
+            }
+
+            let start = new Date(fromDateInput.value + 'T00:00:00');
+            let end = new Date(toDateInput.value + 'T00:00:00');
+
+            if (start > end) {
+                // Swap if inverted
+                const temp = start;
+                start = end;
+                end = temp;
+            }
+
+            applyDateRange(start, end);
+        });
 
         // -------------------------------------------------------------
         // PWA Service Worker Registration
