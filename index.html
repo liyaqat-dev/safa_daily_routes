@@ -162,6 +162,54 @@
             color: #090e1a;
         }
 
+        /* Live Sync Button */
+        .sync-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4vw;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 0.45vh 0.9vw;
+            border-radius: 9999px;
+            font-size: 1.6vh;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .sync-btn:hover {
+            background: #1e293b;
+            border-color: #38bdf8;
+            color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+        }
+
+        .sync-btn.syncing {
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
+        .sync-btn.syncing svg {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .last-sync-time {
+            color: #64748b;
+            font-size: 1.35vh;
+            font-weight: 600;
+            padding-left: 0.35vw;
+            border-left: 1px solid #334155;
+            margin-left: 0.2vw;
+            font-variant-numeric: tabular-nums;
+        }
+
         /* Filter Trigger Button */
         .filter-btn {
             display: flex;
@@ -414,21 +462,30 @@
                 <div id="filter-active-pill" class="filter-active-pill hidden">
                     <span class="filter-pill-dot"></span>
                     <span id="filter-pill-text">FILTERED</span>
-                    <button id="quick-reset-btn" class="quick-reset-btn" title="Reset to Live Rolling Window">✕ Reset</button>
+                    <button id="quick-reset-btn" class="quick-reset-btn" title="Reset to Live Rolling Window (R)">✕ Reset</button>
                 </div>
 
+                <!-- Manual Live Sync Button -->
+                <button id="manual-sync-btn" class="sync-btn" title="Sync live schedule data now (S)">
+                    <svg id="sync-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span id="sync-btn-label">Sync</span>
+                </button>
+
                 <!-- Supabase Realtime Status Badge -->
-                <div class="status-badge">
+                <div class="status-badge" id="status-badge-container" title="Supabase Realtime Sync Status">
                     <span class="live-dot" id="connection-dot"></span>
                     <span id="connection-status">Connecting...</span>
+                    <span id="last-sync-time" class="last-sync-time">--:--:--</span>
                 </div>
 
                 <!-- Date Range Filter Trigger Button -->
-                <button id="open-filter-btn" class="filter-btn" title="Filter Schedule Dates">
+                <button id="open-filter-btn" class="filter-btn" title="Filter Schedule Dates (F)">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                     </svg>
-                    <span>Filter Date</span>
+                    <span id="filter-btn-text">Filter Date</span>
                 </button>
 
                 <!-- Live Clock Display -->
@@ -461,18 +518,27 @@
 
     <!-- Date Range & Preset Filter Modal -->
     <div id="filter-modal" class="filter-modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md">
-        <div class="filter-modal-box bg-[#0f172a] border border-[#334155] rounded-2xl p-6 w-[92vw] max-w-lg shadow-2xl text-slate-100 flex flex-col gap-5">
+        <div class="filter-modal-box bg-[#0f172a] border border-[#334155] rounded-2xl p-6 w-[92vw] max-w-lg shadow-2xl text-slate-100 flex flex-col gap-4">
             <!-- Modal Header -->
             <div class="flex items-center justify-between border-b border-[#334155] pb-3">
                 <div class="flex items-center gap-2">
                     <span class="text-sky-400 font-extrabold text-xl">📅 Schedule Date Filter</span>
                     <span id="modal-view-mode-badge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full border border-slate-700">Custom Range</span>
                 </div>
-                <button id="close-filter-modal-btn" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+                <button id="close-filter-modal-btn" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition" title="Close (Esc)">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
+            </div>
+
+            <!-- Sync & Filter Persistence Notice -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-slate-300 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Realtime sync stays active on filtered dates</span>
+                </div>
+                <span id="modal-sync-timestamp" class="text-slate-400 font-mono">Sync: --:--:--</span>
             </div>
 
             <!-- Quick Presets Section -->
@@ -481,37 +547,43 @@
                     <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Quick Presets</span>
                     <span class="text-[11px] text-sky-400 font-semibold">1-Click Fast Switch</span>
                 </div>
-                <div class="grid grid-cols-3 gap-2.5">
+                <div class="grid grid-cols-4 gap-2">
                     <!-- Yesterday Preset Button -->
-                    <button id="preset-yesterday-btn" class="bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/50 hover:border-amber-400 text-amber-300 font-bold py-2.5 px-2 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-sm shadow-amber-500/10">
-                        <span class="text-sm flex items-center gap-1">🕒 Yesterday</span>
-                        <span class="text-[10px] text-amber-200/80 font-medium">1-Day Past View</span>
+                    <button id="preset-yesterday-btn" class="preset-btn bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/50 hover:border-amber-400 text-amber-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-amber-500/10 cursor-pointer">
+                        <span class="text-xs flex items-center gap-1">🕒 Yesterday</span>
+                        <span class="text-[9px] text-amber-200/80 font-medium">1-Day Past</span>
+                    </button>
+
+                    <!-- Today Only Preset Button -->
+                    <button id="preset-today-btn" class="preset-btn bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/50 hover:border-blue-400 text-blue-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-blue-500/10 cursor-pointer">
+                        <span class="text-xs flex items-center gap-1">📅 Today</span>
+                        <span class="text-[9px] text-blue-200/80 font-medium">1-Day Focus</span>
                     </button>
 
                     <!-- Yesterday to Tomorrow Preset Button -->
-                    <button id="preset-yesterday-tomorrow-btn" class="bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/50 hover:border-purple-400 text-purple-300 font-bold py-2.5 px-2 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-sm shadow-purple-500/10">
-                        <span class="text-sm">Yest. → Tom.</span>
-                        <span class="text-[10px] text-purple-200/80 font-medium">3-Day Archive</span>
+                    <button id="preset-yesterday-tomorrow-btn" class="preset-btn bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/50 hover:border-purple-400 text-purple-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-purple-500/10 cursor-pointer">
+                        <span class="text-xs">Yest. → Tom.</span>
+                        <span class="text-[9px] text-purple-200/80 font-medium">3-Day View</span>
                     </button>
 
                     <!-- Live Rolling 3-Day Window (Default) -->
-                    <button id="preset-live-3day-btn" class="bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold py-2.5 px-2 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-sm shadow-emerald-500/10">
-                        <span class="text-sm flex items-center gap-1">🟢 Live 3-Day</span>
-                        <span class="text-[10px] text-emerald-200/80 font-medium">Today + 2 Days</span>
+                    <button id="preset-live-3day-btn" class="preset-btn bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-emerald-500/10 cursor-pointer">
+                        <span class="text-xs flex items-center gap-1">🟢 Live 3-Day</span>
+                        <span class="text-[9px] text-emerald-200/80 font-medium">Rolling Window</span>
                     </button>
                 </div>
             </div>
 
             <!-- Custom From - To Range Section -->
-            <div class="flex flex-col gap-3 pt-3 border-t border-[#334155]">
+            <div class="flex flex-col gap-2.5 pt-2.5 border-t border-[#334155]">
                 <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Select Custom Date Range (From - To)</span>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">From Date (Start)</label>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">From Date (Start)</label>
                         <input type="date" id="filter-from-date" class="w-full bg-[#0b1322] border border-[#334155] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">To Date (End)</label>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">To Date (End)</label>
                         <input type="date" id="filter-to-date" class="w-full bg-[#0b1322] border border-[#334155] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
                     </div>
                 </div>
@@ -524,15 +596,15 @@
             </div>
 
             <!-- Modal Action Buttons -->
-            <div class="flex items-center justify-between pt-3 border-t border-[#334155] gap-3">
-                <button id="reset-filter-modal-btn" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">
+            <div class="flex items-center justify-between pt-2.5 border-t border-[#334155] gap-3">
+                <button id="reset-filter-modal-btn" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer">
                     Reset to Live
                 </button>
                 <div class="flex items-center gap-2">
-                    <button id="cancel-filter-modal-btn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                    <button id="cancel-filter-modal-btn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">
                         Cancel
                     </button>
-                    <button id="apply-filter-btn" class="px-5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-slate-950 transition shadow-lg shadow-sky-500/25">
+                    <button id="apply-filter-btn" class="px-5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-slate-950 transition shadow-lg shadow-sky-500/25 cursor-pointer">
                         Apply Filter View
                     </button>
                 </div>
@@ -542,11 +614,69 @@
 
     <script>
         // -------------------------------------------------------------
-        // Application State
+        // Persistent Filter State Management
         // -------------------------------------------------------------
-        let isCustomFilter = false;
-        let customFilterDates = []; // Array of Date objects when filtered
+        const FILTER_STORAGE_KEY = 'safa_tv_schedule_filter_v2';
+
+        let filterState = {
+            isFiltered: false,
+            preset: null, // 'yesterday' | 'today_only' | 'yesterday_tomorrow' | 'august_demo' | 'custom'
+            startDateStr: null,
+            endDateStr: null
+        };
+
         let currentTodayStr = new Date().toDateString();
+        let lastSyncTimestamp = null;
+        let isCurrentlyFetching = false;
+
+        function saveFilterState() {
+            try {
+                localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filterState));
+            } catch (e) {
+                console.warn('LocalStorage save error:', e);
+            }
+        }
+
+        function loadFilterState() {
+            // 1. Check URL parameters first (e.g. ?preset=yesterday or ?from=2026-08-29&to=2026-08-31)
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramPreset = urlParams.get('preset');
+            const paramFrom = urlParams.get('from');
+            const paramTo = urlParams.get('to');
+
+            if (paramPreset === 'yesterday') {
+                filterState = { isFiltered: true, preset: 'yesterday', startDateStr: null, endDateStr: null };
+                return;
+            } else if (paramPreset === 'today') {
+                filterState = { isFiltered: true, preset: 'today_only', startDateStr: null, endDateStr: null };
+                return;
+            } else if (paramPreset === 'archive') {
+                filterState = { isFiltered: true, preset: 'yesterday_tomorrow', startDateStr: null, endDateStr: null };
+                return;
+            } else if (paramPreset === 'live') {
+                filterState = { isFiltered: false, preset: null, startDateStr: null, endDateStr: null };
+                return;
+            } else if (paramFrom && paramTo) {
+                filterState = { isFiltered: true, preset: 'custom', startDateStr: paramFrom, endDateStr: paramTo };
+                return;
+            }
+
+            // 2. Load from localStorage if available
+            try {
+                const saved = localStorage.getItem(FILTER_STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && typeof parsed.isFiltered === 'boolean') {
+                        filterState = parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('LocalStorage load error:', e);
+            }
+        }
+
+        // Initialize saved filter state before anything else
+        loadFilterState();
 
         // -------------------------------------------------------------
         // Live Clock & Midnight Rollover Logic
@@ -561,13 +691,12 @@
             });
             document.getElementById('live-clock').textContent = timeString;
             
-            // Check for midnight rollover (only in default live rolling mode)
+            // Check for midnight rollover
             if (now.toDateString() !== currentTodayStr) {
                 currentTodayStr = now.toDateString();
-                if (!isCustomFilter) {
-                    console.log("Midnight Rollover Detected: Shifting 3-day live window forward.");
-                    fetchSupabaseSchedule(); // Re-calculate rolling dates and re-fetch data
-                }
+                console.log("Midnight Rollover Detected: Updating schedule views.");
+                // Fetch schedule and dynamically advance date windows
+                fetchSupabaseSchedule(true);
             }
         }
         setInterval(updateClock, 1000);
@@ -646,8 +775,45 @@
             return `<span class="badge badge-order">${clean}</span>`;
         }
 
+        // Resolves the concrete dates based on current filter state
+        function resolveFilterDates() {
+            if (!filterState.isFiltered) {
+                return getRollingDates();
+            }
+
+            if (filterState.preset === 'yesterday') {
+                return [getYesterdayDate()];
+            } else if (filterState.preset === 'today_only') {
+                return [new Date()];
+            } else if (filterState.preset === 'yesterday_tomorrow') {
+                const yest = getYesterdayDate();
+                const today = new Date();
+                const tom = new Date(); tom.setDate(today.getDate() + 1);
+                return [yest, today, tom];
+            } else if (filterState.preset === 'august_demo') {
+                const d1 = new Date('2026-08-29T00:00:00');
+                const d2 = new Date('2026-08-30T00:00:00');
+                const d3 = new Date('2026-08-31T00:00:00');
+                return [d1, d2, d3];
+            } else if (filterState.startDateStr && filterState.endDateStr) {
+                const start = new Date(filterState.startDateStr + 'T00:00:00');
+                const end = new Date(filterState.endDateStr + 'T00:00:00');
+                const dates = [];
+                let curr = new Date(start);
+                let count = 0;
+                while (curr <= end && count < 5) {
+                    dates.push(new Date(curr));
+                    curr.setDate(curr.getDate() + 1);
+                    count++;
+                }
+                return dates.length > 0 ? dates : getRollingDates();
+            }
+
+            return getRollingDates();
+        }
+
         // -------------------------------------------------------------
-        // Dynamic Table Structure & Render Logic
+        // Dynamic Table Geometry & Rendering
         // -------------------------------------------------------------
         const scheduleColgroup = document.getElementById('schedule-colgroup');
         const topHeaderRow = document.getElementById('top-header-row');
@@ -725,7 +891,6 @@
         }
 
         function renderRows(rawData = [], dateStrs = []) {
-            // Group Flat Relational Data by Person Name and Date
             const grouped = {};
             rawData.forEach(row => {
                 const name = row.person_name;
@@ -733,9 +898,7 @@
                 grouped[name][row.route_date] = { route: row.route, type: row.type };
             });
 
-            // Extract sorted unique names to maintain fixed layout structure
             const uniqueNames = Object.keys(grouped).sort();
-
             tableBody.innerHTML = '';
 
             // Render EXACTLY 15 rows for TV layout
@@ -754,7 +917,6 @@
                     });
                     tr.innerHTML = rowHTML;
                 } else {
-                    // Empty row placeholder to keep layout stable
                     let emptyHTML = `<td class="empty-row-text">-</td>`;
                     dateStrs.forEach(() => {
                         emptyHTML += `
@@ -784,52 +946,112 @@
             }
         }
 
-        function getActiveDates() {
-            if (isCustomFilter && customFilterDates.length > 0) {
-                return customFilterDates;
+        // -------------------------------------------------------------
+        // Filter UI Synchronization Helper
+        // -------------------------------------------------------------
+        function updateFilterUIElements(activeDates, dateStrs) {
+            const filterPill = document.getElementById('filter-active-pill');
+            const filterPillText = document.getElementById('filter-pill-text');
+            const openFilterBtn = document.getElementById('open-filter-btn');
+            const modalViewModeBadge = document.getElementById('modal-view-mode-badge');
+            const connDot = document.getElementById('connection-dot');
+
+            if (filterState.isFiltered) {
+                filterPill.classList.remove('hidden');
+                openFilterBtn.classList.add('active');
+                if (connDot) connDot.classList.add('filtered');
+
+                let label = '';
+                if (filterState.preset === 'yesterday') {
+                    label = 'YESTERDAY (1-Day)';
+                } else if (filterState.preset === 'today_only') {
+                    label = 'TODAY ONLY';
+                } else if (filterState.preset === 'yesterday_tomorrow') {
+                    label = 'YEST → TOM (3-Day)';
+                } else if (filterState.preset === 'august_demo') {
+                    label = 'DEMO SEED (29–31 AUG)';
+                } else if (dateStrs.length === 1) {
+                    label = dateStrs[0];
+                } else {
+                    label = `${dateStrs[0]} → ${dateStrs[dateStrs.length - 1]}`;
+                }
+                filterPillText.textContent = `FILTERED: ${label}`;
+
+                if (modalViewModeBadge) {
+                    modalViewModeBadge.textContent = `Filtered: ${label}`;
+                    modalViewModeBadge.className = 'text-xs bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/40 font-semibold';
+                }
+            } else {
+                filterPill.classList.add('hidden');
+                openFilterBtn.classList.remove('active');
+                if (connDot) connDot.classList.remove('filtered');
+
+                if (modalViewModeBadge) {
+                    modalViewModeBadge.textContent = 'Live Rolling 3-Day';
+                    modalViewModeBadge.className = 'text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-semibold';
+                }
             }
-            return getRollingDates();
+
+            highlightActivePresetButton();
         }
 
-        async function fetchSupabaseSchedule() {
-            const activeDates = getActiveDates();
+        function highlightActivePresetButton() {
+            const presets = [
+                { id: 'preset-yesterday-btn', active: filterState.isFiltered && filterState.preset === 'yesterday' },
+                { id: 'preset-today-btn', active: filterState.isFiltered && filterState.preset === 'today_only' },
+                { id: 'preset-yesterday-tomorrow-btn', active: filterState.isFiltered && filterState.preset === 'yesterday_tomorrow' },
+                { id: 'preset-live-3day-btn', active: !filterState.isFiltered }
+            ];
+
+            presets.forEach(p => {
+                const el = document.getElementById(p.id);
+                if (!el) return;
+                if (p.active) {
+                    el.classList.add('ring-2', 'ring-sky-400', 'shadow-lg');
+                } else {
+                    el.classList.remove('ring-2', 'ring-sky-400', 'shadow-lg');
+                }
+            });
+        }
+
+        // -------------------------------------------------------------
+        // Supabase Fetch & Realtime Sync Handler
+        // -------------------------------------------------------------
+        async function fetchSupabaseSchedule(isManualOrRealtime = false) {
+            if (isCurrentlyFetching && !isManualOrRealtime) return;
+            isCurrentlyFetching = true;
+
+            const syncBtn = document.getElementById('manual-sync-btn');
+            const syncLabel = document.getElementById('sync-btn-label');
+            if (syncBtn) {
+                syncBtn.classList.add('syncing');
+                if (syncLabel) syncLabel.textContent = 'Syncing...';
+            }
+
+            // Always resolve dates using the persistent filter state
+            const activeDates = resolveFilterDates();
             const dateStrs = activeDates.map(d => formatDateForDB(d));
 
             // Update Dynamic Table Geometry
             updateTableStructure(activeDates);
 
-            // Update Filter Status Pill
-            const filterPill = document.getElementById('filter-active-pill');
-            const filterPillText = document.getElementById('filter-pill-text');
-            const openFilterBtn = document.getElementById('open-filter-btn');
-            const connDot = document.getElementById('connection-dot');
+            // Update Filter Indicators and Badges
+            updateFilterUIElements(activeDates, dateStrs);
 
-            if (isCustomFilter) {
-                filterPill.classList.remove('hidden');
-                openFilterBtn.classList.add('active');
-                if (dateStrs.length === 1) {
-                    const singleDate = activeDates[0];
-                    const label = isSameDay(singleDate, getYesterdayDate()) ? 'YESTERDAY' : dateStrs[0];
-                    filterPillText.textContent = `FILTER: ${label}`;
-                } else {
-                    filterPillText.textContent = `FILTER: ${dateStrs[0]} → ${dateStrs[dateStrs.length - 1]}`;
-                }
-                connDot.classList.add('filtered');
-            } else {
-                filterPill.classList.add('hidden');
-                openFilterBtn.classList.remove('active');
-                connDot.classList.remove('filtered');
-            }
+            const connDot = document.getElementById('connection-dot');
+            const statusText = document.getElementById('connection-status');
+            const lastSyncEl = document.getElementById('last-sync-time');
+            const modalSyncTimestamp = document.getElementById('modal-sync-timestamp');
 
             if (!supabaseClient) {
                 renderRows([], dateStrs);
-                document.getElementById('connection-status').textContent = 'Demo Mode (No Keys)';
-                connDot.classList.add('offline');
+                if (statusText) statusText.textContent = 'Demo Mode (No Keys)';
+                if (connDot) connDot.classList.add('offline');
+                completeSync();
                 return;
             }
 
             try {
-                // Query strictly the active date range from DB
                 const fromDateStr = dateStrs[0];
                 const toDateStr = dateStrs[dateStrs.length - 1];
 
@@ -842,13 +1064,34 @@
                 if (error) throw error;
 
                 renderRows(data || [], dateStrs);
-                
-                document.getElementById('connection-status').textContent = isCustomFilter ? 'Filtered View (Live)' : 'Live (Realtime)';
-                connDot.classList.remove('offline');
+
+                const now = new Date();
+                lastSyncTimestamp = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                if (lastSyncEl) lastSyncEl.textContent = `Sync ${lastSyncTimestamp}`;
+                if (modalSyncTimestamp) modalSyncTimestamp.textContent = `Synced: ${lastSyncTimestamp}`;
+
+                if (statusText) {
+                    statusText.textContent = filterState.isFiltered ? 'Filtered (Synced)' : 'Live (Synced)';
+                }
+                if (connDot) connDot.classList.remove('offline');
             } catch (err) {
-                console.error('Could not fetch remote table:', err);
-                document.getElementById('connection-status').textContent = 'Error (Retrying...)';
-                connDot.classList.add('offline');
+                console.error('Could not sync remote schedule table:', err);
+                if (statusText) statusText.textContent = 'Sync Error (Retrying)';
+                if (connDot) connDot.classList.add('offline');
+            } finally {
+                completeSync();
+            }
+        }
+
+        function completeSync() {
+            isCurrentlyFetching = false;
+            const syncBtn = document.getElementById('manual-sync-btn');
+            const syncLabel = document.getElementById('sync-btn-label');
+            if (syncBtn) {
+                setTimeout(() => {
+                    syncBtn.classList.remove('syncing');
+                    if (syncLabel) syncLabel.textContent = 'Sync';
+                }, 350);
             }
         }
 
@@ -860,16 +1103,21 @@
             supabaseClient
                 .channel('safa-realtime-channel')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'safa_daily_routes' }, (payload) => {
-                    console.log('Realtime change detected:', payload);
-                    fetchSupabaseSchedule();
+                    console.log('Realtime change received from database:', payload);
+                    // Flash sync animation and refresh data without losing active filter
+                    const syncBtn = document.getElementById('manual-sync-btn');
+                    if (syncBtn) syncBtn.classList.add('syncing');
+                    fetchSupabaseSchedule(true);
                 })
                 .subscribe((status) => {
+                    const statusText = document.getElementById('connection-status');
+                    const connDot = document.getElementById('connection-dot');
                     if (status === 'SUBSCRIBED') {
-                        document.getElementById('connection-status').textContent = isCustomFilter ? 'Filtered View (Live)' : 'Live (Realtime)';
-                        document.getElementById('connection-dot').classList.remove('offline');
+                        if (statusText) statusText.textContent = filterState.isFiltered ? 'Filtered (Live)' : 'Live (Realtime)';
+                        if (connDot) connDot.classList.remove('offline');
                     } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                        document.getElementById('connection-status').textContent = 'Connecting...';
-                        document.getElementById('connection-dot').classList.add('offline');
+                        if (statusText) statusText.textContent = 'Connecting...';
+                        if (connDot) connDot.classList.add('offline');
                     }
                 });
         }
@@ -884,19 +1132,27 @@
         const applyFilterBtn = document.getElementById('apply-filter-btn');
         const resetFilterModalBtn = document.getElementById('reset-filter-modal-btn');
         const quickResetBtn = document.getElementById('quick-reset-btn');
+        const manualSyncBtn = document.getElementById('manual-sync-btn');
 
         const fromDateInput = document.getElementById('filter-from-date');
         const toDateInput = document.getElementById('filter-to-date');
 
         const presetYesterdayBtn = document.getElementById('preset-yesterday-btn');
+        const presetTodayBtn = document.getElementById('preset-today-btn');
         const presetYesterdayTomorrowBtn = document.getElementById('preset-yesterday-tomorrow-btn');
         const presetLive3DayBtn = document.getElementById('preset-live-3day-btn');
         const presetAugustDemoBtn = document.getElementById('preset-august-demo-btn');
 
         function openModal() {
-            const activeDates = getActiveDates();
+            const activeDates = resolveFilterDates();
+            // Populate dates into inputs only when opening to not overwrite user edits
             fromDateInput.value = formatDateForDB(activeDates[0]);
             toDateInput.value = formatDateForDB(activeDates[activeDates.length - 1]);
+            highlightActivePresetButton();
+            if (lastSyncTimestamp) {
+                const modalSyncTimestamp = document.getElementById('modal-sync-timestamp');
+                if (modalSyncTimestamp) modalSyncTimestamp.textContent = `Synced: ${lastSyncTimestamp}`;
+            }
             filterModal.classList.remove('hidden');
         }
 
@@ -905,78 +1161,117 @@
         }
 
         function resetToLive() {
-            isCustomFilter = false;
-            customFilterDates = [];
+            filterState = {
+                isFiltered: false,
+                preset: null,
+                startDateStr: null,
+                endDateStr: null
+            };
+            saveFilterState();
             closeModal();
-            fetchSupabaseSchedule();
+            fetchSupabaseSchedule(true);
         }
 
-        function applyDateRange(startDate, endDate) {
-            // Build array of dates from startDate to endDate
-            const dates = [];
-            let curr = new Date(startDate);
-            // Cap at 5 days to preserve readable TV columns
-            let count = 0;
-            while (curr <= endDate && count < 5) {
-                dates.push(new Date(curr));
-                curr.setDate(curr.getDate() + 1);
-                count++;
+        function applyPreset(presetName) {
+            if (presetName === 'live_3day') {
+                resetToLive();
+                return;
             }
 
-            if (dates.length === 0) return;
+            filterState = {
+                isFiltered: true,
+                preset: presetName,
+                startDateStr: null,
+                endDateStr: null
+            };
 
-            isCustomFilter = true;
-            customFilterDates = dates;
+            if (presetName === 'august_demo') {
+                filterState.startDateStr = '2026-08-29';
+                filterState.endDateStr = '2026-08-31';
+            }
+
+            saveFilterState();
             closeModal();
-            fetchSupabaseSchedule();
+            fetchSupabaseSchedule(true);
         }
 
-        // Event Listeners for Filter Modal
+        function applyCustomDateRange(startDate, endDate) {
+            const startStr = formatDateForDB(startDate);
+            const endStr = formatDateForDB(endDate);
+
+            filterState = {
+                isFiltered: true,
+                preset: 'custom',
+                startDateStr: startStr,
+                endDateStr: endStr
+            };
+
+            saveFilterState();
+            closeModal();
+            fetchSupabaseSchedule(true);
+        }
+
+        // Event Listeners for Filter Modal & Actions
         openFilterBtn.addEventListener('click', openModal);
         closeFilterModalBtn.addEventListener('click', closeModal);
         cancelFilterModalBtn.addEventListener('click', closeModal);
         resetFilterModalBtn.addEventListener('click', resetToLive);
         quickResetBtn.addEventListener('click', resetToLive);
 
+        // Manual Live Sync Button Click
+        manualSyncBtn.addEventListener('click', () => {
+            fetchSupabaseSchedule(true);
+        });
+
         // Close on background click
         filterModal.addEventListener('click', (e) => {
             if (e.target === filterModal) closeModal();
         });
 
-        // Close on Escape key
+        // Keyboard & Smart TV Remote Shortcuts
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !filterModal.classList.contains('hidden')) {
+            if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) {
+                if (e.key === 'Escape') closeModal();
+                return;
+            }
+
+            const key = e.key.toLowerCase();
+            if (key === 'escape' && !filterModal.classList.contains('hidden')) {
                 closeModal();
+            } else if (key === 'f') {
+                if (filterModal.classList.contains('hidden')) {
+                    openModal();
+                } else {
+                    closeModal();
+                }
+            } else if (key === 's') {
+                fetchSupabaseSchedule(true);
+            } else if (key === 'r') {
+                resetToLive();
             }
         });
 
-        // Preset 1: Yesterday (Single Day View)
+        // Preset 1: Yesterday (1-Day Past View)
         presetYesterdayBtn.addEventListener('click', () => {
-            const yest = getYesterdayDate();
-            fromDateInput.value = formatDateForDB(yest);
-            toDateInput.value = formatDateForDB(yest);
-            applyDateRange(yest, yest);
+            applyPreset('yesterday');
         });
 
-        // Preset 2: Yesterday to Tomorrow (3-Day Archive View)
+        // Preset 2: Today (1-Day Current View)
+        presetTodayBtn.addEventListener('click', () => {
+            applyPreset('today_only');
+        });
+
+        // Preset 3: Yesterday to Tomorrow (3-Day Archive View)
         presetYesterdayTomorrowBtn.addEventListener('click', () => {
-            const yest = getYesterdayDate();
-            const tom = new Date(); tom.setDate(new Date().getDate() + 1);
-            fromDateInput.value = formatDateForDB(yest);
-            toDateInput.value = formatDateForDB(tom);
-            applyDateRange(yest, tom);
+            applyPreset('yesterday_tomorrow');
         });
 
-        // Preset 3: Live 3-Day Default
+        // Preset 4: Live 3-Day Default
         presetLive3DayBtn.addEventListener('click', resetToLive);
 
-        // Preset 4: August Seed Demo Data
+        // Preset 5: August Seed Demo Data
         presetAugustDemoBtn.addEventListener('click', () => {
-            const d1 = new Date('2026-08-29T00:00:00');
-            const d3 = new Date('2026-08-31T00:00:00');
-            fromDateInput.value = '2026-08-29';
-            toDateInput.value = '2026-08-31';
-            applyDateRange(d1, d3);
+            applyPreset('august_demo');
         });
 
         // Apply Custom From - To Filter
@@ -990,13 +1285,12 @@
             let end = new Date(toDateInput.value + 'T00:00:00');
 
             if (start > end) {
-                // Swap if inverted
                 const temp = start;
                 start = end;
                 end = temp;
             }
 
-            applyDateRange(start, end);
+            applyCustomDateRange(start, end);
         });
 
         // -------------------------------------------------------------
