@@ -1,7 +1,7 @@
-// SAFA Schedule Dashboard Service Worker (v3)
+// SAFA Schedule Dashboard Service Worker (v4)
 // Optimized for GitHub Pages sub-directories, responsive layouts, and immediate cache invalidation
 
-const CACHE_NAME = 'safa-dashboard-v3';
+const CACHE_NAME = 'safa-dashboard-v4';
 const PRECACHE_ASSETS = [
     './',
     './index.html',

@@ -6,7 +6,7 @@
     <title>SAFA - Schedule Dashboard</title>
     <meta name="description" content="Read-only TV digital dashboard for SAFA schedule." />
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#090e1a">
+    <meta name="theme-color" content="#153E70">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icon.svg">
     <!-- Tailwind CSS CDN -->
@@ -14,6 +14,21 @@
     <!-- Supabase JS SDK CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --color-navy: #153E70;
+            --color-navy-dark: #0f2d52;
+            --color-navy-light: #1e5292;
+            --color-mint: #1BD488;
+            --color-mint-dark: #129c63;
+            --color-mint-light: #45e0a0;
+            --color-canvas: #FBFCFC;
+            --color-canvas-alt: #F7F7F7;
+            --color-slate-muted: #B5B7B9;
+            --color-slate-subtext: #696C71;
+            --color-charcoal: #0E151E;
+            --color-charcoal-light: #252525;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -23,8 +38,8 @@
         body, html {
             height: 100vh;
             width: 100vw;
-            background-color: #090e1a; /* Ultra-deep high-contrast slate */
-            color: #f8fafc;
+            background-color: var(--color-canvas);
+            color: var(--color-charcoal);
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
@@ -35,26 +50,30 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            padding: clamp(8px, 1.5vh, 18px) clamp(10px, 1.8vw, 24px);
+            padding: clamp(8px, 1.4vh, 16px) clamp(10px, 1.6vw, 24px);
             overflow: hidden;
             box-sizing: border-box;
             position: relative;
+            background-color: var(--color-canvas);
         }
 
-        /* Top Bar */
+        /* Top Bar Header */
         .top-bar {
-            min-height: 44px;
-            height: clamp(44px, 6.5vh, 68px);
+            min-height: 48px;
+            height: clamp(48px, 6.8vh, 72px);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #1e293b;
-            padding-bottom: clamp(4px, 0.6vh, 8px);
-            margin-bottom: clamp(4px, 0.6vh, 8px);
+            background-color: var(--color-navy);
+            border: 1px solid var(--color-navy-dark);
+            border-radius: 0.75rem;
+            padding: 0 clamp(10px, 1.4vw, 20px);
+            margin-bottom: clamp(6px, 1vh, 12px);
             gap: clamp(8px, 1vw, 20px);
             flex-shrink: 0;
             position: relative;
             z-index: 20;
+            box-shadow: 0 4px 14px rgba(21, 62, 112, 0.2);
         }
 
         .brand-section {
@@ -66,22 +85,22 @@
         }
 
         .brand-logo {
-            font-size: clamp(20px, 3.6vh, 36px);
+            font-size: clamp(20px, 3.6vh, 34px);
             font-weight: 900;
-            letter-spacing: 0.12em;
-            color: #38bdf8;
-            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            letter-spacing: 0.14em;
+            color: var(--color-mint);
+            text-shadow: 0 0 16px rgba(27, 212, 136, 0.45);
             flex-shrink: 0;
             white-space: nowrap;
         }
 
         .brand-title {
-            font-size: clamp(12px, 2vh, 20px);
+            font-size: clamp(12px, 1.9vh, 18px);
             font-weight: 700;
             letter-spacing: 0.08em;
-            color: #94a3b8;
+            color: #FBFCFC;
             text-transform: uppercase;
-            border-left: 2px solid #334155;
+            border-left: 2px solid rgba(251, 252, 252, 0.35);
             padding-left: clamp(6px, 0.8vw, 12px);
             white-space: nowrap;
             overflow: hidden;
@@ -96,17 +115,18 @@
             max-width: 100%;
         }
 
+        /* Status Badge */
         .status-badge {
             display: flex;
             align-items: center;
             gap: 6px;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            padding: clamp(3px, 0.4vh, 6px) clamp(8px, 0.8vw, 14px);
+            background-color: var(--color-navy-dark);
+            border: 1px solid rgba(181, 183, 185, 0.35);
+            padding: clamp(3px, 0.45vh, 6px) clamp(8px, 0.8vw, 14px);
             border-radius: 9999px;
-            font-size: clamp(11px, 1.5vh, 15px);
+            font-size: clamp(11px, 1.45vh, 14px);
             font-weight: 600;
-            color: #cbd5e1;
+            color: #FBFCFC;
             white-space: nowrap;
             flex-shrink: 1;
         }
@@ -114,11 +134,11 @@
         .live-dot {
             height: 10px;
             width: 10px;
-            background-color: #22c55e;
+            background-color: var(--color-mint);
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 10px #22c55e;
-            animation: pulse-green 2s infinite;
+            box-shadow: 0 0 10px var(--color-mint);
+            animation: pulse-mint 2s infinite;
             flex-shrink: 0;
         }
 
@@ -134,7 +154,7 @@
             animation: none;
         }
 
-        @keyframes pulse-green {
+        @keyframes pulse-mint {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.85); }
         }
@@ -144,10 +164,10 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            background-color: rgba(245, 158, 11, 0.16);
-            border: 1px solid #f59e0b;
-            color: #fde68a;
-            padding: clamp(3px, 0.35vh, 6px) clamp(6px, 0.7vw, 12px);
+            background-color: rgba(27, 212, 136, 0.18);
+            border: 1.5px solid var(--color-mint);
+            color: #FBFCFC;
+            padding: clamp(3px, 0.4vh, 6px) clamp(8px, 0.8vw, 12px);
             border-radius: 9999px;
             font-size: clamp(11px, 1.4vh, 14px);
             font-weight: 700;
@@ -160,18 +180,18 @@
         .filter-pill-dot {
             height: 8px;
             width: 8px;
-            background-color: #f59e0b;
+            background-color: var(--color-mint);
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 8px #f59e0b;
+            box-shadow: 0 0 8px var(--color-mint);
             flex-shrink: 0;
         }
 
         .quick-reset-btn {
-            background: rgba(245, 158, 11, 0.25);
-            border: 1px solid rgba(245, 158, 11, 0.5);
-            color: #ffffff;
-            padding: 2px 6px;
+            background: var(--color-navy-dark);
+            border: 1px solid rgba(251, 252, 252, 0.35);
+            color: #FBFCFC;
+            padding: 2px 7px;
             border-radius: 9999px;
             font-size: 11px;
             font-weight: 800;
@@ -181,8 +201,9 @@
         }
 
         .quick-reset-btn:hover {
-            background: #f59e0b;
-            color: #090e1a;
+            background: var(--color-mint);
+            color: var(--color-charcoal);
+            border-color: var(--color-mint);
         }
 
         /* Live Sync Button */
@@ -190,13 +211,13 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #94a3b8;
+            background: var(--color-navy-dark);
+            border: 1px solid rgba(181, 183, 185, 0.4);
+            color: #FBFCFC;
             padding: clamp(4px, 0.45vh, 8px) clamp(8px, 0.8vw, 14px);
             min-height: 32px;
             border-radius: 9999px;
-            font-size: clamp(11px, 1.5vh, 15px);
+            font-size: clamp(11px, 1.45vh, 14px);
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -206,15 +227,15 @@
         }
 
         .sync-btn:hover {
-            background: #1e293b;
-            border-color: #38bdf8;
-            color: #38bdf8;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+            background: var(--color-navy-light);
+            border-color: var(--color-mint);
+            color: var(--color-mint);
+            box-shadow: 0 0 12px rgba(27, 212, 136, 0.3);
         }
 
         .sync-btn.syncing {
-            border-color: #38bdf8;
-            color: #38bdf8;
+            border-color: var(--color-mint);
+            color: var(--color-mint);
         }
 
         .sync-btn.syncing svg {
@@ -227,31 +248,31 @@
         }
 
         .last-sync-time {
-            color: #64748b;
+            color: var(--color-slate-muted);
             font-size: clamp(10px, 1.3vh, 13px);
             font-weight: 600;
             padding-left: 6px;
-            border-left: 1px solid #334155;
+            border-left: 1px solid rgba(181, 183, 185, 0.3);
             margin-left: 2px;
             font-variant-numeric: tabular-nums;
             white-space: nowrap;
         }
 
-        /* Filter Trigger Button - Distinct, Prominent, Highly Visible */
+        /* Filter Trigger Button - Action Button in Vibrant Mint */
         .filter-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            border: 1.5px solid #38bdf8;
-            color: #ffffff;
+            background: var(--color-mint);
+            border: 1.5px solid var(--color-mint-light);
+            color: var(--color-charcoal);
             padding: clamp(4px, 0.45vh, 8px) clamp(10px, 0.9vw, 16px);
             min-height: 32px;
             border-radius: 9999px;
-            font-size: clamp(12px, 1.6vh, 16px);
+            font-size: clamp(12px, 1.55vh, 15px);
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+            box-shadow: 0 2px 12px rgba(27, 212, 136, 0.4);
             transition: all 0.2s ease;
             user-select: none;
             white-space: nowrap;
@@ -261,23 +282,23 @@
         }
 
         .filter-btn:hover {
-            background: #0ea5e9;
-            color: #ffffff;
-            box-shadow: 0 0 22px rgba(56, 189, 248, 0.6);
+            background: var(--color-mint-light);
+            color: var(--color-charcoal);
+            box-shadow: 0 4px 18px rgba(27, 212, 136, 0.6);
             transform: translateY(-1px);
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
-            border-color: #fbbf24;
-            color: #fef08a;
-            box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+            background: var(--color-navy-dark);
+            border-color: var(--color-mint);
+            color: var(--color-mint);
+            box-shadow: 0 0 14px rgba(27, 212, 136, 0.5);
         }
 
         .clock-display {
-            font-size: clamp(14px, 2.6vh, 26px);
-            font-weight: 700;
-            color: #f1f5f9;
+            font-size: clamp(14px, 2.4vh, 24px);
+            font-weight: 800;
+            color: #FBFCFC;
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.05em;
             padding-left: 4px;
@@ -285,7 +306,7 @@
             flex-shrink: 0;
         }
 
-        /* Floating Filter Button for small viewports & inspect view */
+        /* Floating Filter Button for small viewports */
         .floating-filter-fab {
             display: none;
             position: fixed;
@@ -295,36 +316,35 @@
             width: 3.5rem;
             height: 3.5rem;
             border-radius: 9999px;
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            border: 2px solid #38bdf8;
-            color: #ffffff;
+            background: var(--color-mint);
+            border: 2px solid var(--color-navy);
+            color: var(--color-charcoal);
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.5);
+            box-shadow: 0 4px 18px rgba(27, 212, 136, 0.5);
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .floating-filter-fab:hover {
             transform: scale(1.08);
-            background: #0ea5e9;
-            box-shadow: 0 6px 26px rgba(56, 189, 248, 0.7);
+            background: var(--color-mint-light);
+            box-shadow: 0 6px 24px rgba(27, 212, 136, 0.7);
         }
 
         .floating-filter-fab.active {
-            background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
-            border-color: #fbbf24;
-            color: #fef08a;
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.6);
+            background: var(--color-navy);
+            border-color: var(--color-mint);
+            color: var(--color-mint);
         }
 
-        /* Responsive Breakpoints for Inspecting & DevTools Docking */
+        /* Responsive Breakpoints */
         @media (max-width: 1200px) {
             .brand-title {
-                display: none; /* Hide subtitle so controls never get pushed off */
+                display: none;
             }
             .status-badge .last-sync-time {
-                display: none; /* Hide timestamp */
+                display: none;
             }
         }
 
@@ -333,11 +353,11 @@
                 gap: 8px;
             }
             .filter-btn {
-                padding: 5px 10px;
+                padding: 4px 10px;
                 font-size: 13px;
             }
             .sync-btn {
-                padding: 5px 8px;
+                padding: 4px 8px;
                 font-size: 13px;
             }
             .clock-display {
@@ -347,10 +367,10 @@
 
         @media (max-width: 720px) {
             #connection-status {
-                display: none; /* Keep just the live dot */
+                display: none;
             }
             #sync-btn-label {
-                display: none; /* Keep just the sync icon */
+                display: none;
             }
             .filter-active-pill span#filter-pill-text {
                 max-width: 90px;
@@ -361,17 +381,17 @@
 
         @media (max-width: 580px) {
             .clock-display {
-                display: none; /* Hide clock on narrow mobile so Filter & Sync stay 100% visible */
+                display: none;
             }
             .floating-filter-fab {
-                display: flex; /* Show floating FAB in addition to top-bar button */
+                display: flex;
             }
         }
 
         @media (max-height: 550px) {
             .top-bar {
-                min-height: 38px;
-                height: 38px;
+                min-height: 40px;
+                height: 40px;
                 margin-bottom: 4px;
             }
             .brand-logo {
@@ -387,17 +407,17 @@
             }
         }
 
-        /* Table Structure */
+        /* Table Structure & Clean Container */
         .table-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             min-height: 0;
-            border: 1px solid #334155;
+            border: 1.5px solid var(--color-slate-muted);
             border-radius: 0.75rem;
             overflow: hidden;
-            background-color: #0f172a;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            background-color: #FFFFFF;
+            box-shadow: 0 4px 20px rgba(14, 21, 30, 0.08);
         }
 
         table {
@@ -407,68 +427,66 @@
             table-layout: fixed;
         }
 
-        /* Headers */
+        /* Headers: Deep Navy */
         thead {
-            background-color: #1e293b;
+            background-color: var(--color-navy);
         }
 
         .top-header-row {
-            height: 4.2vh;
-            border-bottom: 1px solid #334155;
+            height: 4.4vh;
+            border-bottom: 1.5px solid rgba(251, 252, 252, 0.25);
         }
 
         .top-header-row th {
             text-align: center;
-            font-size: 2.2vh;
+            font-size: 2.1vh;
             font-weight: 800;
             letter-spacing: 0.06em;
             text-transform: uppercase;
+            color: #FBFCFC;
         }
 
-        /* Dynamic Day Group Header Gradients */
+        /* Day Group Headers */
         .day-group-yesterday {
-            background: linear-gradient(180deg, #1e293b 0%, #451a03 100%);
-            color: #fbbf24;
-            border-left: 2px solid #d97706;
-            border-right: 2px solid #334155;
-            text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+            background-color: var(--color-navy-dark);
+            color: #FCD34D;
+            border-left: 2px solid var(--color-slate-muted);
+            border-right: 1px solid rgba(251, 252, 252, 0.15);
         }
 
         .day-group-today {
-            background: linear-gradient(180deg, #1e293b 0%, #172554 100%);
-            color: #60a5fa;
-            border-left: 2px solid #3b82f6;
-            border-right: 2px solid #334155;
-            text-shadow: 0 0 12px rgba(96, 165, 250, 0.35);
+            background-color: var(--color-navy);
+            color: var(--color-mint);
+            border-left: 2px solid var(--color-slate-muted);
+            border-right: 1px solid rgba(251, 252, 252, 0.15);
+            text-shadow: 0 0 10px rgba(27, 212, 136, 0.35);
         }
 
         .day-group-tomorrow {
-            background: linear-gradient(180deg, #1e293b 0%, #1e1b4b 100%);
-            color: #c084fc;
-            border-left: 2px solid #a855f7;
-            border-right: 2px solid #334155;
-            text-shadow: 0 0 12px rgba(192, 132, 252, 0.35);
+            background-color: #17457d;
+            color: #FBFCFC;
+            border-left: 2px solid var(--color-slate-muted);
+            border-right: 1px solid rgba(251, 252, 252, 0.15);
         }
 
         .day-group-other {
-            background: linear-gradient(180deg, #1e293b 0%, #042f2e 100%);
-            color: #2dd4bf;
-            border-left: 2px solid #14b8a6;
-            border-right: 1px solid #334155;
-            text-shadow: 0 0 12px rgba(45, 212, 191, 0.35);
+            background-color: var(--color-navy);
+            color: #FBFCFC;
+            border-left: 2px solid var(--color-slate-muted);
+            border-right: 1px solid rgba(251, 252, 252, 0.15);
         }
 
         .sub-header-row {
-            height: 3.6vh;
-            background-color: #111c30;
-            border-bottom: 2px solid #334155;
+            height: 3.5vh;
+            background-color: var(--color-navy-dark);
+            border-bottom: 2px solid var(--color-slate-muted);
         }
 
         .sub-header-row th {
-            font-size: 1.8vh;
+            font-size: 1.7vh;
             font-weight: 700;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
+            letter-spacing: 0.06em;
+            color: var(--color-slate-muted);
             text-transform: uppercase;
             padding: 0 0.8vw;
             text-align: left;
@@ -478,19 +496,23 @@
             text-align: center;
         }
 
-        /* Data Rows: exactly 15 rows distributed evenly */
+        /* Data Rows: exactly 15 rows distributed evenly without page scrollbars */
         tbody tr {
-            height: calc((100% - 7.8vh) / 15);
-            border-bottom: 1px solid #1e293b;
+            height: calc((100% - 7.9vh) / 15);
+            border-bottom: 1px solid #E2E8F0;
             transition: background-color 0.15s ease;
         }
 
         tbody tr:nth-child(even) {
-            background-color: #0b1322;
+            background-color: #FFFFFF;
         }
 
         tbody tr:nth-child(odd) {
-            background-color: #101a2d;
+            background-color: var(--color-canvas-alt);
+        }
+
+        tbody tr:hover {
+            background-color: #EBF3FC;
         }
 
         tbody tr:last-child {
@@ -499,29 +521,30 @@
 
         tbody td {
             padding: 0 0.8vw;
-            font-size: 2.1vh;
+            font-size: 2vh;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
+            color: var(--color-charcoal);
         }
 
         /* Column Group Dividers */
         .day-divider-left {
-            border-left: 2px solid #334155;
+            border-left: 1.5px solid #CBD5E1;
         }
 
         .cell-name {
-            color: #f8fafc;
-            font-weight: 700;
-            font-size: 2.2vh;
-            letter-spacing: 0.02em;
+            color: var(--color-charcoal);
+            font-weight: 800;
+            font-size: 2.1vh;
+            letter-spacing: 0.01em;
         }
 
         .cell-route {
-            color: #e2e8f0;
-            font-weight: 600;
+            color: var(--color-charcoal-light);
+            font-weight: 700;
             text-transform: uppercase;
         }
 
@@ -533,30 +556,30 @@
             max-width: 9vw;
             padding: 0.25vh 0;
             border-radius: 0.375rem;
-            font-size: 1.8vh;
+            font-size: 1.7vh;
             font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
         .badge-order {
-            background-color: rgba(14, 165, 233, 0.18);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.4);
+            background-color: rgba(21, 62, 112, 0.12);
+            color: var(--color-navy);
+            border: 1.5px solid rgba(21, 62, 112, 0.45);
         }
 
         .badge-supply {
-            background-color: rgba(34, 197, 94, 0.18);
-            color: #4ade80;
-            border: 1px solid rgba(74, 222, 128, 0.4);
+            background-color: rgba(27, 212, 136, 0.18);
+            color: #0b6c3f;
+            border: 1.5px solid var(--color-mint);
         }
 
         .badge-empty {
-            color: #475569;
+            color: var(--color-slate-muted);
         }
 
         .empty-row-text {
-            color: #334155;
+            color: var(--color-slate-muted);
         }
 
         /* Modal Styles */
@@ -572,6 +595,9 @@
 
         .filter-modal-box {
             animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            background-color: var(--color-canvas);
+            border: 2px solid var(--color-slate-muted);
+            color: var(--color-charcoal);
         }
 
         @keyframes modalPop {
@@ -579,15 +605,80 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
+        /* Preset Buttons */
+        .preset-btn {
+            background-color: #FFFFFF;
+            border: 1.5px solid var(--color-slate-muted);
+            color: var(--color-charcoal);
+            transition: all 0.15s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--color-navy);
+            background-color: #EDF4FC;
+        }
+
+        .preset-btn.active-preset {
+            border-color: var(--color-navy);
+            background-color: rgba(21, 62, 112, 0.1);
+            box-shadow: 0 0 0 2px var(--color-navy);
+        }
+
+        /* Date Input Component */
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            background-color: #FFFFFF;
+            border: 1.5px solid var(--color-slate-muted);
+            border-radius: 0.75rem;
+            padding: 0.4rem 0.75rem;
+            transition: all 0.15s ease;
+        }
+
+        .date-input-group:focus-within {
+            border-color: var(--color-navy);
+            box-shadow: 0 0 0 3px rgba(21, 62, 112, 0.18);
+        }
+
+        .date-input-field {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--color-charcoal);
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .date-input-field::placeholder {
+            color: var(--color-slate-muted);
+            font-weight: 500;
+        }
+
+        .calendar-trigger-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-navy);
             cursor: pointer;
+            padding: 0.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            transition: all 0.15s ease;
+        }
+
+        .calendar-trigger-btn:hover {
+            color: var(--color-mint-dark);
+            background-color: rgba(27, 212, 136, 0.15);
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Top Bar Header -->
+        <!-- Top Bar Header (Deep Navy) -->
         <div class="top-bar">
             <div class="brand-section">
                 <div class="brand-logo">SAFA</div>
@@ -617,7 +708,7 @@
                     <span id="sync-btn-label">Sync</span>
                 </button>
 
-                <!-- Date Range Filter Trigger Button (Prominent & High Priority) -->
+                <!-- Date Range Filter Trigger Button (Action Button in Vibrant Mint) -->
                 <button id="open-filter-btn" class="filter-btn" title="Filter Schedule Dates (F)">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
@@ -661,96 +752,150 @@
     </div>
 
     <!-- Date Range & Preset Filter Modal -->
-    <div id="filter-modal" class="filter-modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-        <div class="filter-modal-box bg-[#0f172a] border border-[#334155] rounded-2xl p-4 sm:p-6 w-[95vw] max-w-lg shadow-2xl text-slate-100 flex flex-col gap-3 sm:gap-4 my-auto max-h-[92vh] overflow-y-auto">
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between border-b border-[#334155] pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-sky-400 font-extrabold text-xl">📅 Schedule Date Filter</span>
-                    <span id="modal-view-mode-badge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full border border-slate-700">Custom Range</span>
+    <div id="filter-modal" class="filter-modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+        <div class="filter-modal-box rounded-2xl w-[95vw] max-w-lg shadow-2xl flex flex-col my-auto max-h-[92vh] overflow-hidden border border-[#B5B7B9]">
+            <!-- Modal Header (Deep Navy) -->
+            <div class="bg-[#153E70] text-white px-5 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="font-extrabold text-lg text-[#FBFCFC] tracking-wide">📅 Schedule Date Filter</span>
+                    <span id="modal-view-mode-badge" class="text-xs bg-[#0f2d52] text-[#1BD488] px-2.5 py-0.5 rounded-full border border-[#1e5292] font-bold">Custom Range</span>
                 </div>
-                <button id="close-filter-modal-btn" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition" title="Close (Esc)">
+                <button id="close-filter-modal-btn" class="text-[#FBFCFC]/80 hover:text-white p-1 rounded-lg hover:bg-[#0f2d52] transition cursor-pointer" title="Close (Esc)">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
 
-            <!-- Sync & Filter Persistence Notice -->
-            <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-slate-300 flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Realtime sync stays active on filtered dates</span>
-                </div>
-                <span id="modal-sync-timestamp" class="text-slate-400 font-mono">Sync: --:--:--</span>
-            </div>
-
-            <!-- Quick Presets Section -->
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Quick Presets</span>
-                    <span class="text-[11px] text-sky-400 font-semibold">1-Click Fast Switch</span>
-                </div>
-                <div class="grid grid-cols-4 gap-2">
-                    <!-- Yesterday Preset Button -->
-                    <button id="preset-yesterday-btn" class="preset-btn bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/50 hover:border-amber-400 text-amber-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-amber-500/10 cursor-pointer">
-                        <span class="text-xs flex items-center gap-1">🕒 Yesterday</span>
-                        <span class="text-[9px] text-amber-200/80 font-medium">1-Day Past</span>
-                    </button>
-
-                    <!-- Today Only Preset Button -->
-                    <button id="preset-today-btn" class="preset-btn bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/50 hover:border-blue-400 text-blue-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-blue-500/10 cursor-pointer">
-                        <span class="text-xs flex items-center gap-1">📅 Today</span>
-                        <span class="text-[9px] text-blue-200/80 font-medium">1-Day Focus</span>
-                    </button>
-
-                    <!-- Yesterday to Tomorrow Preset Button -->
-                    <button id="preset-yesterday-tomorrow-btn" class="preset-btn bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/50 hover:border-purple-400 text-purple-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-purple-500/10 cursor-pointer">
-                        <span class="text-xs">Yest. → Tom.</span>
-                        <span class="text-[9px] text-purple-200/80 font-medium">3-Day View</span>
-                    </button>
-
-                    <!-- Live Rolling 3-Day Window (Default) -->
-                    <button id="preset-live-3day-btn" class="preset-btn bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold py-2 px-1 rounded-xl text-center transition flex flex-col items-center justify-center gap-0.5 shadow-sm shadow-emerald-500/10 cursor-pointer">
-                        <span class="text-xs flex items-center gap-1">🟢 Live 3-Day</span>
-                        <span class="text-[9px] text-emerald-200/80 font-medium">Rolling Window</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Custom From - To Range Section -->
-            <div class="flex flex-col gap-2.5 pt-2.5 border-t border-[#334155]">
-                <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Select Custom Date Range (From - To)</span>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">From Date (Start)</label>
-                        <input type="date" id="filter-from-date" class="w-full bg-[#0b1322] border border-[#334155] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+            <div class="p-4 sm:p-6 flex flex-col gap-4 overflow-y-auto bg-[#FBFCFC]">
+                <!-- Sync & Filter Persistence Notice -->
+                <div class="bg-[#F0F4F8] border border-[#CBD5E1] rounded-xl px-3 py-2 text-xs text-[#696C71] flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#1BD488] inline-block shadow-sm"></span>
+                        <span class="font-medium text-[#0E151E]">Realtime sync automatically updates filtered dates</span>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">To Date (End)</label>
-                        <input type="date" id="filter-to-date" class="w-full bg-[#0b1322] border border-[#334155] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                    <span id="modal-sync-timestamp" class="text-[#696C71] font-mono font-semibold">Sync: --:--:--</span>
+                </div>
+
+                <!-- Quick Presets Section -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase tracking-wider text-[#696C71] font-bold">Quick Presets</span>
+                        <span class="text-[11px] text-[#153E70] font-bold">1-Click Fast Switch</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <!-- Yesterday Preset Button -->
+                        <button id="preset-yesterday-btn" class="preset-btn font-bold py-2 px-1 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
+                            <span class="text-xs flex items-center gap-1 font-bold text-[#0E151E]">🕒 Yesterday</span>
+                            <span class="text-[10px] text-[#696C71] font-semibold">1-Day Past</span>
+                        </button>
+
+                        <!-- Today Only Preset Button -->
+                        <button id="preset-today-btn" class="preset-btn font-bold py-2 px-1 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
+                            <span class="text-xs flex items-center gap-1 font-bold text-[#153E70]">📅 Today</span>
+                            <span class="text-[10px] text-[#696C71] font-semibold">1-Day Current</span>
+                        </button>
+
+                        <!-- Yesterday to Tomorrow Preset Button -->
+                        <button id="preset-yesterday-tomorrow-btn" class="preset-btn font-bold py-2 px-1 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
+                            <span class="text-xs font-bold text-[#0E151E]">Yest. → Tom.</span>
+                            <span class="text-[10px] text-[#696C71] font-semibold">3-Day View</span>
+                        </button>
+
+                        <!-- Live Rolling 3-Day Window (Default) -->
+                        <button id="preset-live-3day-btn" class="preset-btn font-bold py-2 px-1 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer border-[#1BD488] bg-[#1BD488]/10">
+                            <span class="text-xs flex items-center gap-1 font-bold text-[#0b6c3f]">🟢 Live 3-Day</span>
+                            <span class="text-[10px] text-[#0b6c3f] font-semibold">Rolling Window</span>
+                        </button>
                     </div>
                 </div>
-                <div class="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
-                    <span>Supports 1 to 5 days view.</span>
-                    <button id="preset-august-demo-btn" class="text-sky-400 hover:text-sky-300 underline font-medium cursor-pointer">
-                        View Sample Seed (29–31 Aug)
-                    </button>
-                </div>
-            </div>
 
-            <!-- Modal Action Buttons -->
-            <div class="flex items-center justify-between pt-2.5 border-t border-[#334155] gap-3">
-                <button id="reset-filter-modal-btn" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer">
-                    Reset to Live
-                </button>
-                <div class="flex items-center gap-2">
-                    <button id="cancel-filter-modal-btn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">
-                        Cancel
+                <!-- Custom From - To Range Section (Strict dd/mm/yyyy Format) -->
+                <div class="flex flex-col gap-3 pt-3 border-t border-[#B5B7B9]">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase tracking-wider text-[#696C71] font-bold">Select Custom Date Range</span>
+                        <span class="text-xs font-bold text-[#153E70] bg-[#153E70]/10 px-2 py-0.5 rounded">Format: dd/mm/yyyy</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- From Date Input -->
+                        <div>
+                            <label for="filter-from-date" class="block text-xs font-bold text-[#0E151E] mb-1">
+                                From Date <span class="font-medium text-[#696C71]">(dd/mm/yyyy)</span>
+                            </label>
+                            <div class="date-input-group" id="from-date-group">
+                                <input 
+                                    type="text" 
+                                    id="filter-from-date" 
+                                    placeholder="dd/mm/yyyy" 
+                                    maxlength="10" 
+                                    inputmode="numeric"
+                                    class="date-input-field"
+                                    autocomplete="off"
+                                >
+                                <button type="button" id="from-calendar-btn" class="calendar-trigger-btn" title="Choose from calendar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                                <input type="date" id="filter-from-date-native" class="sr-only" tabindex="-1" aria-hidden="true">
+                            </div>
+                        </div>
+
+                        <!-- To Date Input -->
+                        <div>
+                            <label for="filter-to-date" class="block text-xs font-bold text-[#0E151E] mb-1">
+                                To Date <span class="font-medium text-[#696C71]">(dd/mm/yyyy)</span>
+                            </label>
+                            <div class="date-input-group" id="to-date-group">
+                                <input 
+                                    type="text" 
+                                    id="filter-to-date" 
+                                    placeholder="dd/mm/yyyy" 
+                                    maxlength="10" 
+                                    inputmode="numeric"
+                                    class="date-input-field"
+                                    autocomplete="off"
+                                >
+                                <button type="button" id="to-calendar-btn" class="calendar-trigger-btn" title="Choose from calendar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                                <input type="date" id="filter-to-date-native" class="sr-only" tabindex="-1" aria-hidden="true">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date format validation / hint message -->
+                    <div id="filter-date-error" class="hidden text-xs text-red-600 font-semibold flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <span id="filter-date-error-text">Please enter valid dates formatted as dd/mm/yyyy (e.g. 29/08/2026).</span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-[#696C71] pt-0.5">
+                        <span>Displays up to 5 consecutive schedule days.</span>
+                        <button id="preset-august-demo-btn" class="text-[#153E70] hover:text-[#1e5292] underline font-bold cursor-pointer">
+                            View Demo Seed (29/08 – 31/08)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Action Buttons -->
+                <div class="flex items-center justify-between pt-3 border-t border-[#B5B7B9] gap-3">
+                    <button id="reset-filter-modal-btn" class="px-3.5 py-2 rounded-xl text-xs font-bold text-[#696C71] hover:text-[#0E151E] hover:bg-[#F0F2F5] transition cursor-pointer">
+                        Reset to Live
                     </button>
-                    <button id="apply-filter-btn" class="px-5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-slate-950 transition shadow-lg shadow-sky-500/25 cursor-pointer">
-                        Apply Filter View
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="cancel-filter-modal-btn" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#F0F2F5] hover:bg-[#E2E8F0] text-[#0E151E] transition cursor-pointer border border-[#CBD5E1]">
+                            Cancel
+                        </button>
+                        <button id="apply-filter-btn" class="px-5 py-2 rounded-xl text-xs font-extrabold bg-[#1BD488] hover:bg-[#16ba75] text-[#0E151E] transition shadow-md shadow-[#1BD488]/30 cursor-pointer">
+                            Apply Filter View
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -760,13 +905,13 @@
         // -------------------------------------------------------------
         // Persistent Filter State Management
         // -------------------------------------------------------------
-        const FILTER_STORAGE_KEY = 'safa_tv_schedule_filter_v2';
+        const FILTER_STORAGE_KEY = 'safa_tv_schedule_filter_v3';
 
         let filterState = {
             isFiltered: false,
             preset: null, // 'yesterday' | 'today_only' | 'yesterday_tomorrow' | 'august_demo' | 'custom'
-            startDateStr: null,
-            endDateStr: null
+            startDateStr: null, // YYYY-MM-DD
+            endDateStr: null   // YYYY-MM-DD
         };
 
         let currentTodayStr = new Date().toDateString();
@@ -830,15 +975,15 @@
             const timeString = now.toLocaleTimeString('en-US', { 
                 hour12: true, 
                 hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit'
+                minute: '2-digit', 
+                second: '2-digit' 
             });
             document.getElementById('live-clock').textContent = timeString;
             
             // Check for midnight rollover
             if (now.toDateString() !== currentTodayStr) {
                 currentTodayStr = now.toDateString();
-                console.log("Midnight Rollover Detected: Updating schedule views.");
+                console.log("Midnight Rollover Detected: Rolling date windows forward.");
                 // Fetch schedule and dynamically advance date windows
                 fetchSupabaseSchedule(true);
             }
@@ -847,7 +992,7 @@
         updateClock();
 
         // -------------------------------------------------------------
-        // Date Utilities
+        // Date Utilities & Strict DD/MM/YYYY Handling
         // -------------------------------------------------------------
         function getRollingDates() {
             const today = new Date();
@@ -867,6 +1012,43 @@
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        function formatDateToDDMMYYYY(d) {
+            if (!d || isNaN(d.getTime())) return '';
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function parseDDMMYYYY(str) {
+            if (!str) return null;
+            str = str.trim();
+            // Accept DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+            const parts = str.split(/[/.-]/);
+            if (parts.length === 3) {
+                let d = parseInt(parts[0], 10);
+                let m = parseInt(parts[1], 10);
+                let y = parseInt(parts[2], 10);
+
+                // If user entered YYYY-MM-DD
+                if (parts[0].length === 4) {
+                    y = parseInt(parts[0], 10);
+                    m = parseInt(parts[1], 10);
+                    d = parseInt(parts[2], 10);
+                }
+
+                if (y < 100) y += 2000;
+                if (m >= 1 && m <= 12 && d >= 1 && d <= 31 && y >= 2000 && y <= 2100) {
+                    const dateObj = new Date(y, m - 1, d);
+                    // Check date validity (e.g. Feb 31 invalid)
+                    if (!isNaN(dateObj.getTime()) && dateObj.getDate() === d && dateObj.getMonth() === (m - 1)) {
+                        return dateObj;
+                    }
+                }
+            }
+            return null;
         }
 
         function isSameDay(d1, d2) {
@@ -994,7 +1176,7 @@
                     <col style="width: 13%;">
                 `;
             } else {
-                // 4 or more days
+                // 4 or 5 days
                 const nameWidth = 16;
                 const remaining = 84;
                 const dayWidth = remaining / numDays;
@@ -1011,7 +1193,7 @@
             }
             scheduleColgroup.innerHTML = colgroupHTML;
 
-            // 2. Generate Top Header Row
+            // 2. Generate Top Header Row (Deep Navy)
             let topHeaderHTML = '<th></th>';
             activeDates.forEach((d, idx) => {
                 const groupClass = getDayGroupClass(d, idx);
@@ -1116,16 +1298,16 @@
                     label = 'YEST → TOM (3-Day)';
                 } else if (filterState.preset === 'august_demo') {
                     label = 'DEMO SEED (29–31 AUG)';
-                } else if (dateStrs.length === 1) {
-                    label = dateStrs[0];
+                } else if (activeDates.length === 1) {
+                    label = formatDateToDDMMYYYY(activeDates[0]);
                 } else {
-                    label = `${dateStrs[0]} → ${dateStrs[dateStrs.length - 1]}`;
+                    label = `${formatDateToDDMMYYYY(activeDates[0])} → ${formatDateToDDMMYYYY(activeDates[activeDates.length - 1])}`;
                 }
                 if (filterPillText) filterPillText.textContent = `FILTERED: ${label}`;
 
                 if (modalViewModeBadge) {
                     modalViewModeBadge.textContent = `Filtered: ${label}`;
-                    modalViewModeBadge.className = 'text-xs bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/40 font-semibold';
+                    modalViewModeBadge.className = 'text-xs bg-[#0f2d52] text-[#1BD488] px-2.5 py-0.5 rounded-full border border-[#1BD488]/40 font-bold';
                 }
             } else {
                 if (filterPill) filterPill.classList.add('hidden');
@@ -1135,7 +1317,7 @@
 
                 if (modalViewModeBadge) {
                     modalViewModeBadge.textContent = 'Live Rolling 3-Day';
-                    modalViewModeBadge.className = 'text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-semibold';
+                    modalViewModeBadge.className = 'text-xs bg-[#1BD488]/15 text-[#1BD488] px-2.5 py-0.5 rounded-full border border-[#1BD488]/50 font-bold';
                 }
             }
 
@@ -1154,9 +1336,9 @@
                 const el = document.getElementById(p.id);
                 if (!el) return;
                 if (p.active) {
-                    el.classList.add('ring-2', 'ring-sky-400', 'shadow-lg');
+                    el.classList.add('active-preset');
                 } else {
-                    el.classList.remove('ring-2', 'ring-sky-400', 'shadow-lg');
+                    el.classList.remove('active-preset');
                 }
             });
         }
@@ -1270,7 +1452,7 @@
         }
 
         // -------------------------------------------------------------
-        // Filter Modal & Presets Controls
+        // Strict dd/mm/yyyy Date Picker Component Setup
         // -------------------------------------------------------------
         const filterModal = document.getElementById('filter-modal');
         const openFilterBtn = document.getElementById('open-filter-btn');
@@ -1283,6 +1465,12 @@
 
         const fromDateInput = document.getElementById('filter-from-date');
         const toDateInput = document.getElementById('filter-to-date');
+        const fromDateNative = document.getElementById('filter-from-date-native');
+        const toDateNative = document.getElementById('filter-to-date-native');
+        const fromCalendarBtn = document.getElementById('from-calendar-btn');
+        const toCalendarBtn = document.getElementById('to-calendar-btn');
+        const dateErrorBox = document.getElementById('filter-date-error');
+        const dateErrorText = document.getElementById('filter-date-error-text');
 
         const presetYesterdayBtn = document.getElementById('preset-yesterday-btn');
         const presetTodayBtn = document.getElementById('preset-today-btn');
@@ -1290,12 +1478,80 @@
         const presetLive3DayBtn = document.getElementById('preset-live-3day-btn');
         const presetAugustDemoBtn = document.getElementById('preset-august-demo-btn');
 
+        // Binds masked typing and calendar popup synchronization
+        function setupDateInputMask(textInput, nativeInput, calendarBtn) {
+            textInput.addEventListener('input', () => {
+                dateErrorBox.classList.add('hidden');
+                let val = textInput.value.replace(/\D/g, ''); // strip non-numeric
+                if (val.length > 8) val = val.substring(0, 8);
+                
+                let formatted = '';
+                if (val.length > 0) {
+                    formatted = val.substring(0, 2);
+                }
+                if (val.length >= 3) {
+                    formatted += '/' + val.substring(2, 4);
+                }
+                if (val.length >= 5) {
+                    formatted += '/' + val.substring(4, 8);
+                }
+                textInput.value = formatted;
+
+                // Sync to native hidden input if valid
+                const parsed = parseDDMMYYYY(formatted);
+                if (parsed) {
+                    nativeInput.value = formatDateForDB(parsed);
+                }
+            });
+
+            if (calendarBtn && nativeInput) {
+                calendarBtn.addEventListener('click', () => {
+                    if (typeof nativeInput.showPicker === 'function') {
+                        try {
+                            nativeInput.showPicker();
+                        } catch (e) {
+                            nativeInput.focus();
+                            nativeInput.click();
+                        }
+                    } else {
+                        nativeInput.focus();
+                        nativeInput.click();
+                    }
+                });
+
+                nativeInput.addEventListener('change', () => {
+                    if (nativeInput.value) {
+                        const parts = nativeInput.value.split('-');
+                        if (parts.length === 3) {
+                            const y = parseInt(parts[0], 10);
+                            const m = parseInt(parts[1], 10);
+                            const d = parseInt(parts[2], 10);
+                            const picked = new Date(y, m - 1, d);
+                            textInput.value = formatDateToDDMMYYYY(picked);
+                            dateErrorBox.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+        }
+
+        setupDateInputMask(fromDateInput, fromDateNative, fromCalendarBtn);
+        setupDateInputMask(toDateInput, toDateNative, toCalendarBtn);
+
         function openModal() {
             const activeDates = resolveFilterDates();
-            // Populate dates into inputs only when opening to not overwrite user edits
-            fromDateInput.value = formatDateForDB(activeDates[0]);
-            toDateInput.value = formatDateForDB(activeDates[activeDates.length - 1]);
+            // Populate dates strictly in DD/MM/YYYY format
+            const fromDateObj = activeDates[0];
+            const toDateObj = activeDates[activeDates.length - 1];
+
+            fromDateInput.value = formatDateToDDMMYYYY(fromDateObj);
+            toDateInput.value = formatDateToDDMMYYYY(toDateObj);
+            fromDateNative.value = formatDateForDB(fromDateObj);
+            toDateNative.value = formatDateForDB(toDateObj);
+
+            dateErrorBox.classList.add('hidden');
             highlightActivePresetButton();
+
             if (lastSyncTimestamp) {
                 const modalSyncTimestamp = document.getElementById('modal-sync-timestamp');
                 if (modalSyncTimestamp) modalSyncTimestamp.textContent = `Synced: ${lastSyncTimestamp}`;
@@ -1305,6 +1561,7 @@
 
         function closeModal() {
             filterModal.classList.add('hidden');
+            dateErrorBox.classList.add('hidden');
         }
 
         function resetToLive() {
@@ -1424,34 +1681,45 @@
             applyPreset('august_demo');
         });
 
-        // Apply Custom From - To Filter
+        // Apply Custom From - To Filter (Validating dd/mm/yyyy)
         applyFilterBtn.addEventListener('click', () => {
-            if (!fromDateInput.value || !toDateInput.value) {
-                alert('Please select both From and To dates.');
+            const rawFrom = fromDateInput.value.trim();
+            const rawTo = toDateInput.value.trim();
+
+            if (!rawFrom || !rawTo) {
+                dateErrorText.textContent = 'Please enter both From and To dates in dd/mm/yyyy format.';
+                dateErrorBox.classList.remove('hidden');
                 return;
             }
 
-            let start = new Date(fromDateInput.value + 'T00:00:00');
-            let end = new Date(toDateInput.value + 'T00:00:00');
+            let start = parseDDMMYYYY(rawFrom);
+            let end = parseDDMMYYYY(rawTo);
+
+            if (!start || !end) {
+                dateErrorText.textContent = 'Invalid date. Please use dd/mm/yyyy format (e.g., 29/08/2026).';
+                dateErrorBox.classList.remove('hidden');
+                return;
+            }
 
             if (start > end) {
                 const temp = start;
                 start = end;
                 end = temp;
+                fromDateInput.value = formatDateToDDMMYYYY(start);
+                toDateInput.value = formatDateToDDMMYYYY(end);
             }
 
             applyCustomDateRange(start, end);
         });
 
         // -------------------------------------------------------------
-        // PWA Service Worker Registration (GitHub Pages compatible)
+        // PWA Service Worker Registration
         // -------------------------------------------------------------
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
                     .then((registration) => {
                         console.log('PWA ServiceWorker registered with scope:', registration.scope);
-                        // Trigger immediate check to refresh cached shell if new version exists
                         registration.update();
                     })
                     .catch((error) => {
