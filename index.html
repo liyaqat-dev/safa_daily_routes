@@ -582,6 +582,33 @@
             color: var(--color-slate-muted);
         }
 
+        /* Optimized styling for 6 and 7-day (1 week) views on 1080p TV */
+        .dense-schedule th, 
+        .dense-schedule td {
+            padding: 0 clamp(2px, 0.45vw, 6px);
+        }
+        .dense-schedule .top-header-row th {
+            font-size: clamp(11px, 1.6vh, 15px);
+            letter-spacing: 0.02em;
+        }
+        .dense-schedule .sub-header-row th {
+            font-size: clamp(9px, 1.35vh, 12px);
+            padding: 0 clamp(2px, 0.45vw, 6px);
+        }
+        .dense-schedule .cell-name {
+            font-size: clamp(11px, 1.75vh, 16px);
+            padding-left: clamp(4px, 0.6vw, 10px);
+        }
+        .dense-schedule .cell-route {
+            font-size: clamp(10px, 1.6vh, 15px);
+        }
+        .dense-schedule .badge {
+            font-size: clamp(9px, 1.3vh, 12px);
+            padding: 0.15vh 0;
+            letter-spacing: 0.02em;
+            max-width: 100%;
+        }
+
         /* Modal Styles */
         .filter-modal-backdrop {
             transition: opacity 0.2s ease, visibility 0.2s ease;
@@ -783,7 +810,7 @@
                         <span class="text-xs uppercase tracking-wider text-[#696C71] font-bold">Quick Presets</span>
                         <span class="text-[11px] text-[#153E70] font-bold">1-Click Fast Switch</span>
                     </div>
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
                         <!-- Yesterday Preset Button -->
                         <button id="preset-yesterday-btn" class="preset-btn font-bold py-2 px-1 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
                             <span class="text-xs flex items-center gap-1 font-bold text-[#0E151E]">🕒 Yesterday</span>
@@ -802,6 +829,12 @@
                             <span class="text-[10px] text-[#696C71] font-semibold">3-Day View</span>
                         </button>
 
+                        <!-- 7-Day Week Preset Button -->
+                        <button id="preset-week-7day-btn" class="preset-btn font-bold py-2 px-1 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
+                            <span class="text-xs flex items-center gap-1 font-bold text-[#153E70]">📆 7 Days</span>
+                            <span class="text-[10px] text-[#696C71] font-semibold">1-Week View</span>
+                        </button>
+
                         <!-- Live Rolling 3-Day Window (Default) -->
                         <button id="preset-live-3day-btn" class="preset-btn font-bold py-2 px-1 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer border-[#1BD488] bg-[#1BD488]/10">
                             <span class="text-xs flex items-center gap-1 font-bold text-[#0b6c3f]">🟢 Live 3-Day</span>
@@ -812,9 +845,14 @@
 
                 <!-- Custom From - To Range Section (Strict dd/mm/yyyy Format) -->
                 <div class="flex flex-col gap-3 pt-3 border-t border-[#B5B7B9]">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between flex-wrap gap-1.5">
                         <span class="text-xs uppercase tracking-wider text-[#696C71] font-bold">Select Custom Date Range</span>
-                        <span class="text-xs font-bold text-[#153E70] bg-[#153E70]/10 px-2 py-0.5 rounded">Format: dd/mm/yyyy</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" id="set-7days-range-btn" class="text-xs font-bold text-[#153E70] bg-[#153E70]/10 hover:bg-[#153E70]/20 px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1" title="Quickly set a 7-day (1-week) range from selected start date">
+                                <span>⚡ +7 Days (1 Week)</span>
+                            </button>
+                            <span class="text-xs font-bold text-[#153E70] bg-[#153E70]/10 px-2 py-0.5 rounded">Format: dd/mm/yyyy</span>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
@@ -875,11 +913,9 @@
                         <span id="filter-date-error-text">Please enter valid dates formatted as dd/mm/yyyy (e.g. 29/08/2026).</span>
                     </div>
 
-                    <div class="flex items-center justify-between text-xs text-[#696C71] pt-0.5">
-                        <span>Displays up to 5 consecutive schedule days.</span>
-                        <button id="preset-august-demo-btn" class="text-[#153E70] hover:text-[#1e5292] underline font-bold cursor-pointer">
-                            View Demo Seed (29/08 – 31/08)
-                        </button>
+                    <div class="text-xs text-[#696C71] pt-0.5 flex items-center justify-between">
+                        <span>Displays up to 7 consecutive schedule days (1 week gap).</span>
+                        <span class="text-[11px] font-semibold text-[#153E70] bg-[#153E70]/10 px-2 py-0.5 rounded">1 – 7 Days</span>
                     </div>
                 </div>
 
@@ -909,7 +945,7 @@
 
         let filterState = {
             isFiltered: false,
-            preset: null, // 'yesterday' | 'today_only' | 'yesterday_tomorrow' | 'august_demo' | 'custom'
+            preset: null, // 'yesterday' | 'today_only' | 'yesterday_tomorrow' | 'custom'
             startDateStr: null, // YYYY-MM-DD
             endDateStr: null   // YYYY-MM-DD
         };
@@ -941,6 +977,9 @@
                 return;
             } else if (paramPreset === 'archive') {
                 filterState = { isFiltered: true, preset: 'yesterday_tomorrow', startDateStr: null, endDateStr: null };
+                return;
+            } else if (paramPreset === 'week' || paramPreset === '7days') {
+                filterState = { isFiltered: true, preset: 'week_7day', startDateStr: null, endDateStr: null };
                 return;
             } else if (paramPreset === 'live') {
                 filterState = { isFiltered: false, preset: null, startDateStr: null, endDateStr: null };
@@ -1057,22 +1096,28 @@
                    d1.getDate() === d2.getDate();
         }
 
-        function formatDateForHeader(d) {
+        function formatDateForHeader(d, totalDays = 3) {
             const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-            const dateStr = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${days[d.getDay()]}`;
-            
+            const dayName = days[d.getDay()];
+            const dayNum = String(d.getDate()).padStart(2, '0');
+            const monthNum = String(d.getMonth() + 1).padStart(2, '0');
+            const yearNum = d.getFullYear();
+
             const today = new Date();
             const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
             const tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
 
-            if (isSameDay(d, yesterday)) {
-                return `${dateStr} • YEST`;
-            } else if (isSameDay(d, today)) {
-                return `${dateStr} • TODAY`;
-            } else if (isSameDay(d, tomorrow)) {
-                return `${dateStr} • TOM`;
+            let tag = '';
+            if (isSameDay(d, yesterday)) tag = ' • YEST';
+            else if (isSameDay(d, today)) tag = ' • TODAY';
+            else if (isSameDay(d, tomorrow)) tag = ' • TOM';
+
+            if (totalDays >= 6) {
+                // In 6 or 7 day views, compact header: DD/MM/YY DAY • TODAY
+                return `${dayNum}/${monthNum}/${yearNum.toString().slice(-2)} ${dayName}${tag}`;
             }
-            return dateStr;
+
+            return `${dayNum}/${monthNum}/${yearNum} ${dayName}${tag}`;
         }
 
         function getDayGroupClass(d, idx) {
@@ -1116,18 +1161,22 @@
                 const today = new Date();
                 const tom = new Date(); tom.setDate(today.getDate() + 1);
                 return [yest, today, tom];
-            } else if (filterState.preset === 'august_demo') {
-                const d1 = new Date('2026-08-29T00:00:00');
-                const d2 = new Date('2026-08-30T00:00:00');
-                const d3 = new Date('2026-08-31T00:00:00');
-                return [d1, d2, d3];
+            } else if (filterState.preset === 'week_7day') {
+                const today = new Date();
+                const dates = [];
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(today);
+                    d.setDate(today.getDate() + i);
+                    dates.push(d);
+                }
+                return dates;
             } else if (filterState.startDateStr && filterState.endDateStr) {
                 const start = new Date(filterState.startDateStr + 'T00:00:00');
                 const end = new Date(filterState.endDateStr + 'T00:00:00');
                 const dates = [];
                 let curr = new Date(start);
                 let count = 0;
-                while (curr <= end && count < 5) {
+                while (curr <= end && count < 7) {
                     dates.push(new Date(curr));
                     curr.setDate(curr.getDate() + 1);
                     count++;
@@ -1148,6 +1197,16 @@
 
         function updateTableStructure(activeDates) {
             const numDays = activeDates.length;
+            const tableEl = document.querySelector('table');
+
+            // Apply density class when 6 or 7 days are active to ensure perfect fit on 1080p
+            if (tableEl) {
+                if (numDays >= 6) {
+                    tableEl.classList.add('dense-schedule');
+                } else {
+                    tableEl.classList.remove('dense-schedule');
+                }
+            }
 
             // 1. Generate Colgroup based on number of days
             let colgroupHTML = '';
@@ -1175,19 +1234,47 @@
                     <col style="width: 15%;">
                     <col style="width: 13%;">
                 `;
+            } else if (numDays === 4) {
+                colgroupHTML = `
+                    <col style="width: 16%;">
+                    <col style="width: 12.5%;">
+                    <col style="width: 8.5%;">
+                    <col style="width: 12.5%;">
+                    <col style="width: 8.5%;">
+                    <col style="width: 12.5%;">
+                    <col style="width: 8.5%;">
+                    <col style="width: 12.5%;">
+                    <col style="width: 8.5%;">
+                `;
+            } else if (numDays === 5) {
+                colgroupHTML = `
+                    <col style="width: 15%;">
+                    <col style="width: 10%;">
+                    <col style="width: 7%;">
+                    <col style="width: 10%;">
+                    <col style="width: 7%;">
+                    <col style="width: 10%;">
+                    <col style="width: 7%;">
+                    <col style="width: 10%;">
+                    <col style="width: 7%;">
+                    <col style="width: 10%;">
+                    <col style="width: 7%;">
+                `;
+            } else if (numDays === 6) {
+                colgroupHTML = `<col style="width: 13%;">`;
+                for (let i = 0; i < 6; i++) {
+                    colgroupHTML += `
+                        <col style="width: 8.7%;">
+                        <col style="width: 5.8%;">
+                    `;
+                }
             } else {
-                // 4 or 5 days
-                const nameWidth = 16;
-                const remaining = 84;
-                const dayWidth = remaining / numDays;
-                const routeWidth = dayWidth * 0.58;
-                const typeWidth = dayWidth * 0.42;
-
-                colgroupHTML = `<col style="width: ${nameWidth}%;">`;
+                // 7 days (1 full week)
+                colgroupHTML = `<col style="width: 13%;">`;
                 for (let i = 0; i < numDays; i++) {
                     colgroupHTML += `
-                        <col style="width: ${routeWidth}%;">
-                        <col style="width: ${typeWidth}%;">
+                        <col style="width: 7.3%;">
+                        <col style="width: 5.12%;">
                     `;
                 }
             }
@@ -1199,7 +1286,7 @@
                 const groupClass = getDayGroupClass(d, idx);
                 topHeaderHTML += `
                     <th colspan="2" class="${groupClass} day-divider-left">
-                        ${formatDateForHeader(d)}
+                        ${formatDateForHeader(d, numDays)}
                     </th>
                 `;
             });
@@ -1296,12 +1383,12 @@
                     label = 'TODAY ONLY';
                 } else if (filterState.preset === 'yesterday_tomorrow') {
                     label = 'YEST → TOM (3-Day)';
-                } else if (filterState.preset === 'august_demo') {
-                    label = 'DEMO SEED (29–31 AUG)';
+                } else if (filterState.preset === 'week_7day') {
+                    label = '7-DAY WEEK VIEW';
                 } else if (activeDates.length === 1) {
                     label = formatDateToDDMMYYYY(activeDates[0]);
                 } else {
-                    label = `${formatDateToDDMMYYYY(activeDates[0])} → ${formatDateToDDMMYYYY(activeDates[activeDates.length - 1])}`;
+                    label = `${formatDateToDDMMYYYY(activeDates[0])} → ${formatDateToDDMMYYYY(activeDates[activeDates.length - 1])} (${activeDates.length}D)`;
                 }
                 if (filterPillText) filterPillText.textContent = `FILTERED: ${label}`;
 
@@ -1329,6 +1416,7 @@
                 { id: 'preset-yesterday-btn', active: filterState.isFiltered && filterState.preset === 'yesterday' },
                 { id: 'preset-today-btn', active: filterState.isFiltered && filterState.preset === 'today_only' },
                 { id: 'preset-yesterday-tomorrow-btn', active: filterState.isFiltered && filterState.preset === 'yesterday_tomorrow' },
+                { id: 'preset-week-7day-btn', active: filterState.isFiltered && filterState.preset === 'week_7day' },
                 { id: 'preset-live-3day-btn', active: !filterState.isFiltered }
             ];
 
@@ -1475,8 +1563,9 @@
         const presetYesterdayBtn = document.getElementById('preset-yesterday-btn');
         const presetTodayBtn = document.getElementById('preset-today-btn');
         const presetYesterdayTomorrowBtn = document.getElementById('preset-yesterday-tomorrow-btn');
+        const presetWeek7DayBtn = document.getElementById('preset-week-7day-btn');
         const presetLive3DayBtn = document.getElementById('preset-live-3day-btn');
-        const presetAugustDemoBtn = document.getElementById('preset-august-demo-btn');
+        const set7DaysRangeBtn = document.getElementById('set-7days-range-btn');
 
         // Binds masked typing and calendar popup synchronization
         function setupDateInputMask(textInput, nativeInput, calendarBtn) {
@@ -1589,11 +1678,6 @@
                 endDateStr: null
             };
 
-            if (presetName === 'august_demo') {
-                filterState.startDateStr = '2026-08-29';
-                filterState.endDateStr = '2026-08-31';
-            }
-
             saveFilterState();
             closeModal();
             fetchSupabaseSchedule(true);
@@ -1673,15 +1757,34 @@
             applyPreset('yesterday_tomorrow');
         });
 
-        // Preset 4: Live 3-Day Default
+        // Preset 4: 7-Day Week View
+        if (presetWeek7DayBtn) {
+            presetWeek7DayBtn.addEventListener('click', () => {
+                applyPreset('week_7day');
+            });
+        }
+
+        // Preset 5: Live 3-Day Default
         presetLive3DayBtn.addEventListener('click', resetToLive);
 
-        // Preset 5: August Seed Demo Data
-        presetAugustDemoBtn.addEventListener('click', () => {
-            applyPreset('august_demo');
-        });
+        // Quick Helper: Set +7 Days (1 Week) range from start date
+        if (set7DaysRangeBtn) {
+            set7DaysRangeBtn.addEventListener('click', () => {
+                dateErrorBox.classList.add('hidden');
+                let start = parseDDMMYYYY(fromDateInput.value.trim());
+                if (!start) {
+                    start = new Date();
+                    fromDateInput.value = formatDateToDDMMYYYY(start);
+                    fromDateNative.value = formatDateForDB(start);
+                }
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6); // Exactly 7 consecutive days (start + 6)
+                toDateInput.value = formatDateToDDMMYYYY(end);
+                toDateNative.value = formatDateForDB(end);
+            });
+        }
 
-        // Apply Custom From - To Filter (Validating dd/mm/yyyy)
+        // Apply Custom From - To Filter (Validating dd/mm/yyyy up to 7 days)
         applyFilterBtn.addEventListener('click', () => {
             const rawFrom = fromDateInput.value.trim();
             const rawTo = toDateInput.value.trim();
@@ -1707,6 +1810,19 @@
                 end = temp;
                 fromDateInput.value = formatDateToDDMMYYYY(start);
                 toDateInput.value = formatDateToDDMMYYYY(end);
+            }
+
+            // Calculate inclusive day gap
+            const diffTime = Math.abs(end.getTime() - start.getTime());
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            if (diffDays > 7) {
+                // Smoothly clamp to 7 days (1 full week) so exactly 7 days fit on the TV layout
+                const clampedEnd = new Date(start);
+                clampedEnd.setDate(start.getDate() + 6);
+                end = clampedEnd;
+                toDateInput.value = formatDateToDDMMYYYY(end);
+                toDateNative.value = formatDateForDB(end);
             }
 
             applyCustomDateRange(start, end);
